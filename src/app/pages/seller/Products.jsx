@@ -1,0 +1,428 @@
+import React, { useState } from 'react';
+import {
+  useDeleteProductMutation,
+  useGetProductsQuery,
+  useUpdateProductMutation,
+  useAddProductMutation,
+  AdminTableLayout,
+  SnackBar,
+} from '../../../shared';
+import { useForm } from 'react-hook-form';
+import {
+  Box,
+  Typography,
+  Button,
+  Stack,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+} from '@mui/material';
+
+export const Products = () => {
+  const [deleteProduct] = useDeleteProductMutation();
+  const [updateProduct] = useUpdateProductMutation();
+  const [addProduct] = useAddProductMutation();
+
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const { data, isLoading, error } = useGetProductsQuery({ page: page + 1, limit: rowsPerPage });
+
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackMessage, setSnackMessage] = useState('');
+  const [snackSeverity, setSnackSeverity] = useState('error');
+
+  const [open, setOpen] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentPid, setCurrentPid] = useState(null);
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm();
+  const [urlImg, setUrlImg] = useState();
+
+  const handleUpdate = (product) => {
+    setIsEditMode(true);
+    setCurrentPid(product.product_id);
+    setUrlImg(product.product_image_url);
+    reset(product);
+    setOpen(true);
+  };
+
+  const handleOpenAdd = () => {
+    setIsEditMode(false);
+    setCurrentPid(null);
+    setUrlImg('');
+    reset({
+      product_category_name: '',
+      product_weight_g: '',
+      product_height_cm: '',
+      product_length_cm: '',
+      product_width_cm: '',
+      product_photos_qty: '',
+    });
+    setOpen(true);
+  };
+
+  const columns = [
+    {
+      key: 'product_category_name',
+      label: 'product category',
+    },
+    {
+      key: 'product_name',
+      label: 'Product name',
+    },
+    {
+      key: 'product_image_url',
+      label: 'Image',
+      render: (row) => (
+        <img
+          src={row.product_image_url}
+          alt="product"
+          style={{ height: '100px', width: '100px', objectFit: 'cover' }}
+        />
+      ),
+    },
+    {
+      key: 'price',
+      label: 'Price',
+    },
+    {
+      key: 'product_weight_g',
+      label: 'Weight',
+    },
+    {
+      key: 'product_height_cm',
+      label: 'Height',
+    },
+    {
+      key: 'product_width_cm',
+      label: 'Width',
+    },
+    {
+      key: 'product_qty',
+      label: 'Stock',
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (row) => (
+        <Stack direction="row" spacing={1} justifyContent="center">
+          <Button
+            size="small"
+            variant="outlined"
+            color="secondary"
+            onClick={() => handleUpdate(row)}
+          >
+            Edit
+          </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            color="error"
+            onClick={() => handleDelete(row.product_id)}
+          >
+            Delete
+          </Button>
+        </Stack>
+      ),
+    },
+  ];
+
+  const handleDelete = async (pid) => {
+    const user_id = localStorage.getItem('user_id');
+    try {
+      await deleteProduct({
+        sid: user_id,
+        pid: pid,
+      }).unwrap();
+      console.log('Deleted product:', pid);
+    } catch (err) {
+      console.error('Delete failed', err);
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    if (!file) return;
+    const data = new FormData();
+    data.append('file', file);
+    data.append('upload_preset', 'Ecommerce');
+    data.append('cloud_name', 'dyrw2esoq');
+    const res = await fetch('https://api.cloudinary.com/v1_1/dyrw2esoq/image/upload', {
+      method: 'POST',
+      body: data,
+    });
+    const uploaded = await res.json();
+    setUrlImg(uploaded.secure_url);
+    console.log(uploaded.secure_url);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setUrlImg('');
+  };
+
+  const onSubmit = async (formData) => {
+    const user_id = localStorage.getItem('user_id');
+    try {
+      if (isEditMode) {
+        await updateProduct({
+          sid: user_id,
+          pid: currentPid,
+          data: { ...formData, product_image_url: urlImg },
+        }).unwrap();
+        setUrlImg('');
+        setSnackMessage('Updated Successfully');
+        setSnackSeverity('info');
+        setSnackOpen(true);
+      } else {
+        console.log({ ...formData, product_image_url: urlImg });
+        await addProduct({
+          sid: user_id,
+          data: { ...formData, product_image_url: urlImg },
+        }).unwrap();
+        setUrlImg('');
+        setSnackMessage('Added product Successfully');
+        setSnackSeverity('info');
+        setSnackOpen(true);
+      }
+      setOpen(false);
+    } catch (err) {
+      console.error('Operation failed', err);
+    }
+  };
+
+  return (
+    <Box>
+      <Box display="flex" justifyContent="space-between" sx={{ mb: 2 }}>
+        <Typography variant="h4">
+          <strong>Products</strong>
+        </Typography>
+        <Button variant="contained" color="primary" onClick={handleOpenAdd}>
+          Add Product
+        </Button>
+      </Box>
+      <AdminTableLayout
+        // title="Products"
+        columns={columns}
+        data={data || []}
+        page={0}
+        onPageChange={(_, newPage) => setPage(newPage)}
+        rowsPerPage={rowsPerPage}
+        onRowsPerPageChange={(e) => {
+          setRowsPerPage(parseInt(e.target.value, 10));
+          setPage(0);
+        }}
+        totalCount={data?.length || 0}
+        isLoading={isLoading}
+        isError={!!error}
+        getRowId={(row) => row.product_id}
+      />
+
+      <Dialog
+        open={open}
+        onClose={handleClose}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            borderRadius: 3,
+            p: 1,
+          },
+        }}
+      >
+        <DialogTitle
+          sx={{
+            fontWeight: 'bold',
+            color: '#9c35c5',
+            textAlign: 'center',
+            fontSize: '1.4rem',
+          }}
+        >
+          {isEditMode ? 'Update Product' : 'Add New Product'}
+        </DialogTitle>
+
+        <DialogContent>
+          <Box
+            component="form"
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 2,
+              mt: 1,
+            }}
+          >
+            <TextField
+              label="Category"
+              fullWidth
+              {...register('product_category_name', { required: 'Category is required' })}
+              disabled={isEditMode}
+              error={!!errors.product_category_name}
+              helperText={errors.product_category_name?.message}
+            />
+
+            <TextField
+              label="Product Name"
+              fullWidth
+              {...register('product_name', { required: 'Name is required' })}
+              error={!!errors.product_name}
+              helperText={errors.product_name?.message}
+            />
+
+            <TextField
+              label="Price"
+              type="number"
+              fullWidth
+              {...register('price', { required: 'Price is required' })}
+              error={!!errors.price}
+              helperText={errors.price?.message}
+            />
+
+            <TextField
+              label="Stock"
+              type="number"
+              fullWidth
+              {...register('product_qty', { required: 'Quantity is required' })}
+              error={!!errors.product_qty}
+              helperText={errors.product_qty?.message}
+            />
+
+            <TextField
+              label="Weight (g)"
+              type="number"
+              fullWidth
+              {...register('product_weight_g', { required: 'Weight is required' })}
+              error={!!errors.product_weight_g}
+              helperText={errors.product_weight_g?.message}
+            />
+
+            <TextField
+              label="Height (cm)"
+              type="number"
+              fullWidth
+              {...register('product_height_cm', { required: 'Height is required' })}
+              error={!!errors.product_height_cm}
+              helperText={errors.product_height_cm?.message}
+            />
+
+            <TextField
+              label="Length (cm)"
+              type="number"
+              fullWidth
+              {...register('product_length_cm', { required: 'Length is required' })}
+              error={!!errors.product_length_cm}
+              helperText={errors.product_length_cm?.message}
+            />
+
+            <TextField
+              label="Width (cm)"
+              type="number"
+              fullWidth
+              {...register('product_width_cm', { required: 'Width is required' })}
+              error={!!errors.product_width_cm}
+              helperText={errors.product_width_cm?.message}
+            />
+
+            {/* IMAGE SECTION */}
+            <Box sx={{ gridColumn: 'span 2', mt: 1 }}>
+              <Typography
+                variant="subtitle2"
+                sx={{ mb: 1, fontWeight: 'bold', color: 'text.secondary' }}
+              >
+                Product Image
+              </Typography>
+
+              <Box
+                sx={{
+                  border: '2px dashed #9c35c5',
+                  borderRadius: 2,
+                  p: 2,
+                  textAlign: 'center',
+                  background: 'rgba(156,53,197,0.04)',
+                }}
+              >
+                {urlImg && (
+                  <Box mb={2}>
+                    <img
+                      src={urlImg}
+                      alt="preview"
+                      style={{
+                        width: 120,
+                        height: 120,
+                        objectFit: 'cover',
+                        borderRadius: 10,
+                      }}
+                    />
+                  </Box>
+                )}
+
+                <Button
+                  variant="outlined"
+                  component="label"
+                  sx={{
+                    borderColor: '#9c35c5',
+                    color: '#9c35c5',
+                    '&:hover': {
+                      borderColor: '#7b1fa2',
+                      background: 'rgba(156,53,197,0.08)',
+                    },
+                  }}
+                >
+                  {isEditMode ? 'Change Image' : 'Upload Image'}
+                  <input type="file" hidden accept="image/*" onChange={handleFileUpload} />
+                </Button>
+              </Box>
+            </Box>
+          </Box>
+        </DialogContent>
+
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={handleClose}
+            variant="contained"
+            sx={{
+              background: '#9c35c5',
+              textTransform: 'none',
+              px: 3,
+              '&:hover': {
+                background: '#7b1fa2',
+              },
+            }}
+          >
+            Cancel
+          </Button>
+
+          <Button
+            onClick={handleSubmit(onSubmit)}
+            variant="contained"
+            sx={{
+              background: '#9c35c5',
+              textTransform: 'none',
+              px: 3,
+              '&:hover': {
+                background: '#7b1fa2',
+              },
+            }}
+          >
+            {isEditMode ? 'Update Product' : 'Add Product'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <SnackBar
+        open={snackOpen}
+        message={snackMessage}
+        severity={snackSeverity}
+        handleClose={() => setSnackOpen(false)}
+      />
+    </Box>
+  );
+};
