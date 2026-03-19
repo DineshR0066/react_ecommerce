@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import {
   useAddToCartMutation,
   useGetCatalogQuery,
@@ -12,6 +13,7 @@ import {
 } from '../../../shared';
 
 export const Catalog = ({ searchTerm, selectedCategory, filters }) => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
 
   useEffect(() => {
@@ -69,6 +71,11 @@ export const Catalog = ({ searchTerm, selectedCategory, filters }) => {
   const [addToCart] = useAddToCartMutation();
 
   const handleBuy = (product) => {
+    const userRole = localStorage.getItem('role');
+    if (userRole !== 'customer') {
+      navigate('/login');
+      return;
+    }
     setSelectedProduct(product);
     setIsBuyDialogOpen(true);
   };
@@ -79,6 +86,11 @@ export const Catalog = ({ searchTerm, selectedCategory, filters }) => {
   };
 
   const handleAddToCart = async (product_id) => {
+    const userRole = localStorage.getItem('role');
+    if (userRole !== 'customer') {
+      navigate('/login');
+      return;
+    }
     const uid = localStorage.getItem('user_id');
     try {
       await addToCart({ uid: uid, pid: product_id });

@@ -19,12 +19,18 @@ import { ThemeToggle } from '../../styled-components';
 export const CustomerLayout = () => {
   const navigate = useNavigate();
 
+  const userRole = localStorage.getItem('role');
+  const isCustomer = userRole === 'customer';
+
   const menuItems = [
-    // { text: "Products", icon: <GridView/>, path: "/customer/catalog"},
     { text: 'Home', icon: <Home />, path: '/customer/search' },
-    { text: 'Orders', icon: <Storefront />, path: '/customer/orders' },
-    { icon: <Person />, path: '/customer/customer-profile' },
-    { icon: <ShoppingCart />, path: '/customer/cart' },
+    ...(isCustomer
+      ? [
+          { text: 'Orders', icon: <Storefront />, path: '/customer/orders' },
+          { icon: <Person />, path: '/customer/customer-profile' },
+          { icon: <ShoppingCart />, path: '/customer/cart' },
+        ]
+      : []),
   ];
 
   const handleNavigate = (path) => {
@@ -40,9 +46,13 @@ export const CustomerLayout = () => {
           <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
             Ecommerce
           </Typography>
-          <Box>
-            {menuItems.map((item) => (
-              <Button color="inherit" key={item.path} onClick={() => handleNavigate(item.path)}>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            {menuItems.map((item, index) => (
+              <Button
+                color="inherit"
+                key={item.path || index}
+                onClick={() => handleNavigate(item.path)}
+              >
                 {item.icon}
                 {item.text}
               </Button>
@@ -51,15 +61,26 @@ export const CustomerLayout = () => {
                             {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
                         </IconButton> */}
             <ThemeToggle />
-            <Button
-              variant="contained"
-              color="error"
-              startIcon={<Logout />}
-              onClick={handleLogout}
-              sx={{ ml: 2 }}
-            >
-              Logout
-            </Button>
+            {isCustomer ? (
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<Logout />}
+                onClick={handleLogout}
+                sx={{ ml: 2 }}
+              >
+                Logout
+              </Button>
+            ) : (
+              <Button
+                variant="contained"
+                color="success"
+                onClick={() => navigate('/login')}
+                sx={{ ml: 2 }}
+              >
+                Login
+              </Button>
+            )}
           </Box>
         </Toolbar>
       </AppBar>
