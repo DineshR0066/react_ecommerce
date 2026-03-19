@@ -136,6 +136,15 @@ export const customerApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ['customers'],
     }),
+
+    buyAllProducts: builder.mutation({
+      query: (data) => ({
+        url: "/users/bulk-buy",
+        method: "POST",
+        body: data
+      }),
+      invalidatesTags: ["customers"]
+    }),
   }),
 });
 
@@ -156,4 +165,5 @@ export const {
   useAddAddressMutation,
   useDeleteAddressMutation,
   useUpdateCartMutation,
+  useBuyAllProductsMutation,
 } = customerApi;

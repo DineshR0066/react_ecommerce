@@ -7,6 +7,7 @@ import {
   useUpdateCartMutation,
   AdminTableLayout,
   BuyProductDialog,
+  BuyAllDialog,
   DeleteDialog,
   SnackBar,
 } from '../../../shared';
@@ -295,11 +296,10 @@ export const Cart = () => {
         isBulk={false}
         onSuccess={handlePurchaseSuccess}
       />
-      <BuyProductDialog
+      <BuyAllDialog
         open={isBuyAllDialogOpen}
         onClose={() => setIsBuyAllDialogOpen(false)}
-        product={data}
-        isBulk={true}
+        products={data}  
         onSuccess={handleBuyAllSuccess}
       />
       <DeleteDialog
