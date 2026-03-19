@@ -1,6 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
-import { Stack, Button, Container, IconButton } from '@mui/material';
+import { Stack, Button, Container, IconButton, Box, Typography, alpha } from '@mui/material';
 import {
   useCartQuery,
   useRemoveFromCartMutation,
@@ -44,16 +44,28 @@ export const Cart = () => {
       key: 'product_image_url',
       label: 'Image',
       render: (row) => (
-        <img
+        <Box
+          component="img"
           src={row.product_image_url}
-          alt="product"
-          style={{ height: '100px', width: '100px', objectFit: 'cover' }}
+          alt={row.product_name}
+          sx={{
+            height: 64,
+            width: 64,
+            borderRadius: 1.5,
+            objectFit: 'cover',
+            border: (theme) => `1px solid ${theme.palette.divider}`,
+          }}
         />
       ),
     },
     {
       key: 'price',
       label: 'Price',
+      render: (row) => (
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+          ₹{Number(row.price).toLocaleString()}
+        </Typography>
+      ),
     },
     {
       key: 'product_weight_g',
@@ -75,15 +87,35 @@ export const Cart = () => {
       key: 'quantity',
       label: 'Quantity',
       render: (row) => (
-        <Stack direction="row" alignItems="center" spacing={1}>
-          <IconButton onClick={() => handleDecrease(row)}>
-            <Remove />
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={0.5}
+          sx={{
+            border: (theme) => `1px solid ${theme.palette.divider}`,
+            borderRadius: 1,
+            p: 0.5,
+            width: 'fit-content',
+          }}
+        >
+          <IconButton
+            size="small"
+            onClick={() => handleDecrease(row)}
+            sx={{ color: 'text.secondary', p: 0.5 }}
+          >
+            <Remove fontSize="small" />
           </IconButton>
 
-          <span>{row.quantity}</span>
+          <Typography variant="body2" sx={{ minWidth: 24, textAlign: 'center', fontWeight: 700 }}>
+            {row.quantity}
+          </Typography>
 
-          <IconButton onClick={() => handleIncrease(row)}>
-            <Add />
+          <IconButton
+            size="small"
+            onClick={() => handleIncrease(row)}
+            sx={{ color: 'primary.main', p: 0.5 }}
+          >
+            <Add fontSize="small" />
           </IconButton>
         </Stack>
       ),
@@ -92,17 +124,30 @@ export const Cart = () => {
       key: 'actions',
       label: 'Actions',
       render: (row) => (
-        <Stack direction="row" spacing={1} justifyContent="center">
+        <Stack direction="row" spacing={1}>
           <Button
             size="small"
-            variant="outlined"
+            variant="soft"
             color="error"
             onClick={() => handleRemove(row.product_id)}
+            sx={{ 
+              textTransform: 'none', 
+              fontWeight: 700,
+              bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
+              color: 'error.dark',
+              '&:hover': { bgcolor: (theme) => alpha(theme.palette.error.main, 0.16) }
+            }}
           >
-            Remove from cart
+            Remove
           </Button>
-          <Button size="small" variant="outlined" color="primary" onClick={() => handleBuy(row)}>
-            Buy
+          <Button
+            size="small"
+            variant="contained"
+            color="primary"
+            onClick={() => handleBuy(row)}
+            sx={{ textTransform: 'none', fontWeight: 700, boxShadow: 'none' }}
+          >
+            Buy Now
           </Button>
         </Stack>
       ),
@@ -211,10 +256,21 @@ export const Cart = () => {
   };
 
   return (
-    <Container>
-      <Stack direction="row" justifyContent="flex-end" mb={2}>
-        <Button variant="contained" onClick={handleBuyAll}>
-          Buy All
+    <Container maxWidth="xl" sx={{ py: 3 }}>
+      <Stack direction="row" justifyContent="flex-end" mb={3}>
+        <Button
+          variant="contained"
+          onClick={handleBuyAll}
+          sx={{
+            px: 3,
+            py: 1,
+            borderRadius: 2,
+            fontWeight: 700,
+            textTransform: 'none',
+            boxShadow: (theme) => `0 8px 16px 0 ${alpha(theme.palette.primary.main, 0.24)}`,
+          }}
+        >
+          Checkout All Items
         </Button>
       </Stack>
 

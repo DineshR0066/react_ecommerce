@@ -24,7 +24,7 @@ export const CommonLayout = ({ title, menuItems, handleLogout }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', m:0, p:0 }}>
       {!isDesktop && (
         <AppBar
           position="fixed"

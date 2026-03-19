@@ -14,7 +14,42 @@ import {
   TablePagination,
   CircularProgress,
   Alert,
+  styled,
+  alpha,
 } from '@mui/material';
+
+const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
+  borderRadius: theme.spacing(2),
+  boxShadow: 'none',
+  border: `1px solid ${theme.palette.divider}`,
+  backgroundColor: theme.palette.background.paper,
+}));
+
+const StyledTableHead = styled(TableHead)(({ theme }) => ({
+  backgroundColor: theme.palette.background.neutral || alpha(theme.palette.grey[500], 0.08),
+}));
+
+const HeaderCell = styled(TableCell)(({ theme }) => ({
+  color: theme.palette.text.secondary,
+  fontWeight: 700,
+  fontSize: '0.75rem',
+  textTransform: 'uppercase',
+  padding: theme.spacing(2),
+  borderBottom: `1px solid ${theme.palette.divider}`,
+}));
+
+const StyledRow = styled(TableRow)(({ theme }) => ({
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.primary.main, 0.04),
+    transition: theme.transitions.create('background-color'),
+  },
+}));
+
+const DataCell = styled(TableCell)(({ theme }) => ({
+  padding: theme.spacing(2),
+  borderBottom: `1px solid ${theme.palette.divider}`,
+  fontSize: '0.875rem',
+}));
 
 export const AdminTableLayout = ({
   title,
@@ -34,7 +69,7 @@ export const AdminTableLayout = ({
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-        <CircularProgress />
+        <CircularProgress color="primary" />
       </Box>
     );
   }
@@ -42,122 +77,95 @@ export const AdminTableLayout = ({
   if (isError) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error">An error occurred while fetching data. Please try again.</Alert>
+        <Alert severity="error" sx={{ borderRadius: 2 }}>
+          An error occurred while fetching data. Please try again.
+        </Alert>
       </Container>
     );
   }
 
   return (
-    <Container>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
       <Box
         display="flex"
         flexDirection={{ xs: 'column', sm: 'row' }}
         justifyContent="space-between"
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         gap={2}
-        mb={3}
+        mb={4}
       >
-        <Typography
-          variant="h4"
-          fontWeight={700}
-          sx={{ fontSize: { xs: '1.75rem', sm: '2.125rem' } }}
-        >
+        <Typography variant="h4" sx={{ fontWeight: 800 }}>
           {title}
         </Typography>
         {headerActions && (
-          <Box display="flex" gap={1} width={{ xs: '100%', sm: 'auto' }}>
+          <Box display="flex" gap={1.5} width={{ xs: '100%', sm: 'auto' }}>
             {headerActions}
           </Box>
         )}
       </Box>
+
       <Card
-        variant="outlined"
         sx={{
-          borderRadius: 2,
-          boxShadow: '0 0 2px 0 rgba(145,158,171,.2), 0 12px 24px -4px rgba(145,158,171,.12)',
+          borderRadius: 4,
+          boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12)',
           overflow: 'hidden',
         }}
       >
-        {headerContent && headerContent}
-        <TableContainer
-          component={Paper}
-          sx={{
-            borderRadius: 3,
-            overflowX: 'auto',
-            border: '1px solid',
-            borderColor: 'divider',
-            backgroundColor: 'background.paper',
-          }}
-        >
-          <Table>
-            {/* TABLE HEADER */}
-            <TableHead
-              sx={{
-                backgroundColor: 'primary.main',
-              }}
-            >
+        {headerContent && <Box sx={{ p: 2.5 }}>{headerContent}</Box>}
+        
+        <StyledTableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }}>
+            <StyledTableHead>
               <TableRow>
                 {columns.map((col) => (
-                  <TableCell
-                    key={col.key}
-                    sx={{
-                      color: '#fff',
-                      fontWeight: 600,
-                      borderBottom: '2px solid #9c35c5',
-                    }}
-                  >
+                  <HeaderCell key={col.key}>
                     {col.label}
-                  </TableCell>
+                  </HeaderCell>
                 ))}
               </TableRow>
-            </TableHead>
+            </StyledTableHead>
 
-            {/* TABLE BODY */}
-            <TableBody
-              sx={{
-                '& .MuiTableCell-root': {
-                  backgroundColor: (theme) =>
-                    theme.palette.mode === 'light' ? 'rgba(156,53,197,0.03)' : 'background.paper',
-                  color: 'text.primary',
-                  borderColor: (theme) =>
-                    theme.palette.mode === 'light' ? 'rgba(0,0,0,0.08)' : 'divider',
-                },
-              }}
-            >
+            <TableBody>
               {data.map((row, index) => (
-                <TableRow
-                  key={index}
-                  hover
-                  sx={{
-                    '&:hover': {
-                      backgroundColor: 'rgba(156,53,197,0.08)',
-                    },
-                  }}
+                <StyledRow
+                  key={getRowId(row) || index}
                 >
                   {columns.map((col) => (
-                    <TableCell key={col.key}>
-                      {/* ORDER ID highlight */}
+                    <DataCell key={col.key}>
                       {col.key === 'order_id' ? (
-                        <Box
+                        <Typography
+                          variant="subtitle2"
                           sx={{
-                            color: 'secondary.main',
-                            fontWeight: 600,
+                            color: 'primary.main',
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            '&:hover': { textDecoration: 'underline' }
                           }}
                         >
-                          {row[col.key]}
-                        </Box>
+                          #{row[col.key]}
+                        </Typography>
                       ) : col.render ? (
                         col.render(row)
                       ) : (
                         row[col.key]
                       )}
-                    </TableCell>
+                    </DataCell>
                   ))}
-                </TableRow>
+                </StyledRow>
               ))}
+              {data.length === 0 && (
+                <TableRow>
+                  <DataCell colSpan={columns.length} align="center" sx={{ py: 10 }}>
+                    <Typography variant="body1" color="text.secondary">
+                      No data found
+                    </Typography>
+                  </DataCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
-        </TableContainer>
+        </StyledTableContainer>
+
         <TablePagination
           component="div"
           count={totalCount ?? (data.length < rowsPerPage ? page * rowsPerPage + data.length : -1)}
@@ -167,9 +175,14 @@ export const AdminTableLayout = ({
           onRowsPerPageChange={onRowsPerPageChange}
           rowsPerPageOptions={[5, 10, 25]}
           sx={{
-            borderTop: '1px solid',
-            borderColor: 'divider',
-            '.MuiTablePagination-toolbar': { px: 2 },
+            py: 1,
+            px: 2,
+            borderTop: `1px solid ${alpha('#919EAB', 0.12)}`,
+            '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              color: 'text.secondary',
+            },
           }}
         />
       </Card>

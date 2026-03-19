@@ -5,6 +5,7 @@ import {
   Button,
   Box,
   Dialog,
+  Stack,
   DialogTitle,
   DialogContent,
   DialogContentText,
@@ -13,6 +14,7 @@ import {
   IconButton,
   Tooltip,
   Typography,
+  alpha,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
@@ -107,11 +109,21 @@ export const Sellers = () => {
       key: 'actions',
       label: 'Actions',
       render: (row) => (
-        <Tooltip title="Delete seller">
-          <IconButton color="error" size="small" onClick={() => openDeleteDialog(row.id)}>
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
+        <Stack direction="row" spacing={0.5}>
+          <Tooltip title="Delete seller">
+            <IconButton 
+              color="error" 
+              size="small" 
+              onClick={() => openDeleteDialog(row.id)}
+              sx={{ 
+                bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
+                '&:hover': { bgcolor: (theme) => alpha(theme.palette.error.main, 0.16) }
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
       ),
     },
   ];
@@ -140,16 +152,28 @@ export const Sellers = () => {
             sx={{
               textTransform: 'none',
               borderRadius: 1.5,
-              fontWeight: 600,
+              fontWeight: 700,
+              boxShadow: 'none',
+              '&:hover': { boxShadow: 'none' }
             }}
           >
             Add Seller
           </Button>
+
         }
       />
 
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>Add New Seller</DialogTitle>
+      <Dialog 
+        open={open} 
+        onClose={handleClose} 
+        fullWidth 
+        maxWidth="sm"
+        PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+      >
+        <DialogTitle sx={{ fontWeight: 800, textAlign: 'center', fontSize: '1.5rem', py: 3 }}>
+          Add New Seller
+        </DialogTitle>
+
         <DialogContent
           component="form"
           sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
@@ -195,9 +219,23 @@ export const Sellers = () => {
           </Box>
           <TextField label="Zipcode" fullWidth {...register('zip_code')} />
         </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button variant="contained" onClick={handleSubmit(onAddSellerSubmit)} disabled={isAdding}>
+        <DialogActions sx={{ px: 3, pb: 4, pt: 1 }}>
+          <Button 
+            onClick={handleClose}
+            variant="outlined"
+            size="large"
+            color="inherit"
+            sx={{ textTransform: 'none', fontWeight: 700, px: 4, borderRadius: 1.5 }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            variant="contained" 
+            size="large"
+            onClick={handleSubmit(onAddSellerSubmit)} 
+            disabled={isAdding}
+            sx={{ textTransform: 'none', fontWeight: 700, px: 4, borderRadius: 1.5, boxShadow: 'none' }}
+          >
             {isAdding ? 'Adding...' : 'Confirm'}
           </Button>
         </DialogActions>

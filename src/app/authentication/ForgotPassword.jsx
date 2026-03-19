@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { CardContent, Typography, Card, Stack, Box, TextField, Button } from '@mui/material';
+import { useNavigate, Link } from 'react-router-dom';
+import { Typography, Stack, Box, Link as MuiLink } from '@mui/material';
 import { SnackBar, useForgotPasswordMutation } from '../../shared';
+import { StyledCard, StyledTextField, AuthButton } from '../../shared/styled-components/StyledComponents';
 
 export const ForgotPassword = () => {
-
   const {
     register,
     handleSubmit,
@@ -22,83 +22,59 @@ export const ForgotPassword = () => {
 
   const handlePassword = async (data) => {
     try {
-      const res = await forgotPassword(data).unwrap();
-      console.log(res.data);
-      setSnackMessage('Mail sent if existed');
+      await forgotPassword(data).unwrap();
+      setSnackMessage('Email sent if it exists');
       setSnackSeverity('info');
       setSnackOpen(true);
       setTimeout(() => {
         navigate('/');
-      }, 1000);
+      }, 1500);
     } catch (err) {
       console.error(err);
-      setSnackMessage('Invalid mail');
+      setSnackMessage('Invalid email');
       setSnackSeverity('error');
       setSnackOpen(true);
     }
   };
 
-  const textStyle = {
-    '& .MuiInputBase-input': {
-      color: 'black',
-    },
-    '& .MuiInputLabel-root': {
-      color: 'black',
-    },
-    '& .MuiInputLabel-root.Mui-focused': {
-      color: 'black',
-    },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: 'black',
-        borderWidth: '1px', 
-      },
-      '&:hover fieldset': {
-        borderColor: 'black',
-        borderWidth: '2px', 
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: 'black',
-        borderWidth: '2px', 
-      },
-    },
-  };
-
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 7 }}>
-      <Card
-        sx={{
-          p: 4,
-          borderRadius: 12,
-          background: 'rgba(229, 216, 234, 0.92)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-        }}
-      >
-        <CardContent>
-          <Typography variant="h5" align="center" fontWeight="bold">
-            FORGET PASSWORD
-          </Typography>
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <StyledCard sx={{ width: '100%', maxWidth: 480 }}>
+        <Typography variant="h3" align="center" color="#161C24" fontWeight={800} gutterBottom>
+          Forgot Password
+        </Typography>
 
-          <form onSubmit={handleSubmit(handlePassword)}>
-            <Stack spacing={3} sx={{ mt: 2 }}>
-              <TextField
-                label="Email"
-                variant="outlined"
-                fullWidth
-                {...register('email', { required: 'Email is required' })}
-                error={!!errors.email}
-                helperText={errors.email?.message}
-                sx={textStyle}
-              />
+        <Typography variant="body2" align="center" color="#637381" sx={{ mb: 4 }}>
+          Please enter the email address associated with your account and we will email you a password reset link.
+        </Typography>
 
-              <Button variant="contained" type="submit" fullWidth sx={{ py: 1.5, borderRadius: 2 }}>
-                Send Reset Link
-              </Button>
+        <form onSubmit={handleSubmit(handlePassword)}>
+          <Stack spacing={3}>
+            <StyledTextField
+              label="Email address"
+              variant="outlined"
+              fullWidth
+              {...register('email', { required: 'Email is required' })}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+            />
 
-            </Stack>
-          </form>
-        </CardContent>
-      </Card>
+            <AuthButton variant="contained" type="submit" fullWidth size="large">
+              Send Reset Link
+            </AuthButton>
+
+            <Box sx={{ textAlign: 'center' }}>
+              <MuiLink 
+                component={Link} 
+                to="/" 
+                sx={{ color: 'primary.main', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              >
+                Return to login
+              </MuiLink>
+            </Box>
+          </Stack>
+        </form>
+      </StyledCard>
       <SnackBar
         open={snackOpen}
         message={snackMessage}

@@ -11,86 +11,88 @@
 // export default typography;
 
 export const typography = {
-  fontFamily: 'Poppins, sans-serif',
+  fontFamily: '"Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
 
   // Main headings - "Ecom website", page titles
   h1: {
     fontSize: '2.5rem',
-    fontWeight: 700,
+    fontWeight: 800,
     lineHeight: 1.2,
-    letterSpacing: '-0.01em',
+    letterSpacing: '-0.02em',
   },
 
   // Section headings - "LOGIN" card title
   h2: {
-    fontSize: '2rem', // 28px
-    fontWeight: 600,
+    fontSize: '2rem',
+    fontWeight: 700,
     lineHeight: 1.3,
-    letterSpacing: '0.02em',
+    letterSpacing: '0.01em',
   },
 
   // Subsection headings
   h3: {
-    fontSize: '1.5rem', // 24px
-    fontWeight: 600,
+    fontSize: '1.25rem',
+    fontWeight: 700,
     lineHeight: 1.4,
   },
 
   // Product names, card titles
   h4: {
-    fontSize: '1.125rem', // 18px
+    fontSize: '1rem',
     fontWeight: 600,
     lineHeight: 1.4,
   },
 
   // Small headings
   h5: {
-    fontSize: '1rem', // 16px
+    fontSize: '0.875rem',
     fontWeight: 600,
     lineHeight: 1.5,
   },
 
   // Smallest headings
   h6: {
-    fontSize: '0.875rem', // 14px
+    fontSize: '0.75rem',
     fontWeight: 600,
     lineHeight: 1.5,
   },
 
   // Tagline text - "Click. Shop. Enjoy."
   subtitle1: {
-    fontSize: '1.125rem', // 18px
-    fontWeight: 400,
+    fontSize: '1rem',
+    fontWeight: 500,
     lineHeight: 1.5,
-    letterSpacing: '0.01em',
+    textTransform: 'capitalize',
   },
 
   // Secondary subtitles - category labels
   subtitle2: {
-    fontSize: '0.875rem', // 14px
-    fontWeight: 500,
+    fontSize: '0.75rem',
+    fontWeight: 600,
     lineHeight: 1.5,
-    color: 'text.secondary',
+    textTransform: 'capitalize',
   },
 
   // Primary body text - form inputs, table cells
   body1: {
-    fontSize: '1rem', // 16px
+    fontSize: '0.875rem',
     fontWeight: 400,
     lineHeight: 1.6,
+    textTransform: 'capitalize',
   },
 
   // Secondary body text - descriptions, table data
   body2: {
-    fontSize: '0.875rem', // 14px
+    fontSize: '0.8rem',
     fontWeight: 400,
     lineHeight: 1.5,
+    textTransform: 'capitalize',
   },
 
   // Buttons - "LOGIN", "LOGOUT", nav items
   button: {
-    fontSize: '0.875rem', // 14px
-    fontWeight: 600,
+    fontSize: '0.8rem',
+    fontWeight: 700,
     lineHeight: 1.5,
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
@@ -98,17 +100,18 @@ export const typography = {
 
   // Small labels - "Stock: 91", pagination
   caption: {
-    fontSize: '0.75rem', // 12px
-    fontWeight: 400,
+    fontSize: '0.7rem',
+    fontWeight: 500,
     lineHeight: 1.5,
+    textTransform: 'capitalize',
   },
 
   // Form labels, helper text
   overline: {
-    fontSize: '0.75rem', // 12px
-    fontWeight: 500,
+    fontSize: '0.7rem',
+    fontWeight: 700,
     lineHeight: 1.5,
-    textTransform: 'uppercase',
+    textTransform: 'capitalize',
     letterSpacing: '0.08em',
   },
 };

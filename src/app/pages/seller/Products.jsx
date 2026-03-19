@@ -18,6 +18,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  alpha,
 } from '@mui/material';
 
 export const Products = () => {
@@ -64,7 +65,6 @@ export const Products = () => {
       product_height_cm: '',
       product_length_cm: '',
       product_width_cm: '',
-      product_photos_qty: '',
     });
     setOpen(true);
   };
@@ -82,16 +82,28 @@ export const Products = () => {
       key: 'product_image_url',
       label: 'Image',
       render: (row) => (
-        <img
+        <Box
+          component="img"
           src={row.product_image_url}
-          alt="product"
-          style={{ height: '100px', width: '100px', objectFit: 'cover' }}
+          alt={row.product_name}
+          sx={{
+            height: 64,
+            width: 64,
+            borderRadius: 1.5,
+            objectFit: 'cover',
+            border: (theme) => `1px solid ${theme.palette.divider}`,
+          }}
         />
       ),
     },
     {
       key: 'price',
       label: 'Price',
+      render: (row) => (
+        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+          ₹{Number(row.price).toLocaleString()}
+        </Typography>
+      ),
     },
     {
       key: 'product_weight_g',
@@ -113,20 +125,32 @@ export const Products = () => {
       key: 'actions',
       label: 'Actions',
       render: (row) => (
-        <Stack direction="row" spacing={1} justifyContent="center">
+        <Stack direction="row" spacing={1}>
           <Button
             size="small"
-            variant="outlined"
+            variant="soft"
             color="secondary"
             onClick={() => handleUpdate(row)}
+            sx={{ 
+              textTransform: 'none', 
+              fontWeight: 700,
+              bgcolor: (theme) => alpha(theme.palette.secondary.main, 0.08),
+              '&:hover': { bgcolor: (theme) => alpha(theme.palette.secondary.main, 0.16) }
+            }}
           >
             Edit
           </Button>
           <Button
             size="small"
-            variant="outlined"
+            variant="soft"
             color="error"
             onClick={() => handleDelete(row.product_id)}
+            sx={{ 
+              textTransform: 'none', 
+              fontWeight: 700,
+              bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
+              '&:hover': { bgcolor: (theme) => alpha(theme.palette.error.main, 0.16) }
+            }}
           >
             Delete
           </Button>
@@ -241,10 +265,10 @@ export const Products = () => {
       >
         <DialogTitle
           sx={{
-            fontWeight: 'bold',
-            color: '#9c35c5',
+            fontWeight: 800,
             textAlign: 'center',
-            fontSize: '1.4rem',
+            fontSize: '1.5rem',
+            py: 3,
           }}
         >
           {isEditMode ? 'Update Product' : 'Add New Product'}
@@ -384,17 +408,17 @@ export const Products = () => {
           </Box>
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, pb: 2 }}>
+        <DialogActions sx={{ px: 3, pb: 4, pt: 2 }}>
           <Button
             onClick={handleClose}
-            variant="contained"
+            variant="outlined"
+            size="large"
+            color="inherit"
             sx={{
-              background: '#9c35c5',
               textTransform: 'none',
-              px: 3,
-              '&:hover': {
-                background: '#7b1fa2',
-              },
+              fontWeight: 700,
+              px: 4,
+              borderRadius: 1.5,
             }}
           >
             Cancel
@@ -403,13 +427,13 @@ export const Products = () => {
           <Button
             onClick={handleSubmit(onSubmit)}
             variant="contained"
+            size="large"
             sx={{
-              background: '#9c35c5',
               textTransform: 'none',
-              px: 3,
-              '&:hover': {
-                background: '#7b1fa2',
-              },
+              fontWeight: 700,
+              px: 4,
+              borderRadius: 1.5,
+              boxShadow: 'none',
             }}
           >
             {isEditMode ? 'Update Product' : 'Add Product'}

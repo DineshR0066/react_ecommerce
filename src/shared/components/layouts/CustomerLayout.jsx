@@ -37,7 +37,7 @@ export const CustomerLayout = () => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
             Ecommerce
           </Typography>
           <Box>
@@ -63,7 +63,7 @@ export const CustomerLayout = () => {
           </Box>
         </Toolbar>
       </AppBar>
-      <Container sx={{ mt: 4 }}>
+      <Container maxWidth={false} sx={{ mt: 4, px: 0 }}>
         <Outlet />
       </Container>
     </Box>

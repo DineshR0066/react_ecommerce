@@ -13,6 +13,7 @@ import {
   CardActionArea,
   Divider,
 } from '@mui/material';
+import { ProductStyledCard } from '../../styled-components';
 
 export const ProductCardLayout = ({
   data = [],
@@ -41,24 +42,12 @@ export const ProductCardLayout = ({
   }
 
   return (
-    <Container maxWidth="xl" sx={{ py: 4 }}>
+    <Container maxWidth={false} sx={{ px: { xs: 2, sm: 3, md: 5 }, py: 0 }}>
       <Grid container spacing={1}>
         {data.length > 0 ? (
           data.map((product) => (
-            <Grid item key={product.product_id} xs={12} sm={6} md={4} lg={3}>
-              <Card
-                sx={{
-                  height: 350, // Strict fixed height
-                  width: 200,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'transform 0.2s',
-                  '&:hover': {
-                    transform: 'scale(1.02)',
-                    boxShadow: 8,
-                  },
-                }}
-              >
+            <Grid item key={product.product_id} sx={{ display: 'flex', justifyContent: 'center' }} xs={12} sm={6} md={4} lg={3} xl={2}>
+              <ProductStyledCard>
                 <CardActionArea
                   onClick={() => onCardClick(product)}
                   sx={{
@@ -71,15 +60,15 @@ export const ProductCardLayout = ({
                   <CardMedia
                     component="img"
                     sx={{
-                      height: 200,
-                      width: 200,
+                      height: 160,
+                      width: '100%',
                       objectFit: 'cover',
                       flexShrink: 0,
                     }}
                     image={
                       product.product_image_url ||
                       'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop'
-                    } // Use a better fallback
+                    }
                     alt={product.product_name || 'product'}
                   />
                   <CardContent
@@ -87,40 +76,32 @@ export const ProductCardLayout = ({
                       flexGrow: 1,
                       display: 'flex',
                       flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      overflowY: 'auto',
-                      padding: 2,
-                      // Hide scrollbar
-                      '&::-webkit-scrollbar': { display: 'none' },
-                      msOverflowStyle: 'none',
-                      scrollbarWidth: 'none',
+                      p: 2,
+                      overflow: 'hidden',
                     }}
                   >
-                    <Box
-                      sx={{
-                        overflowY: 'auto',
-                        mb: 1,
-                        flexGrow: 1,
-                        '&::-webkit-scrollbar': { display: 'none' },
-                        msOverflowStyle: 'none',
-                        scrollbarWidth: 'none',
-                      }}
-                    >
+                    <Box sx={{ mb: 1, flexGrow: 1, overflow: 'hidden' }}>
                       <Typography
-                        gutterBottom
-                        variant="h6"
-                        component="div"
-                        sx={{ lineHeight: 1.2, mb: 1 }}
+                        variant="subtitle2"
+                        sx={{
+                          lineHeight: 1.2,
+                          mb: 0.5,
+                          fontWeight: 600,
+                          // color: '#212B36',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                        }}
                       >
-                        {product.product_name || 'No description'}
+                        {product.product_name || 'No title'}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
                         {product.product_category_name || 'Uncategorized'}
                       </Typography>
                     </Box>
 
-                    <Box sx={{ flexShrink: 0 }}>
-                      <Divider sx={{ mb: 1 }} />
+                    <Box sx={{ mt: 'auto' }}>
                       <Box
                         sx={{
                           display: 'flex',
@@ -128,21 +109,27 @@ export const ProductCardLayout = ({
                           alignItems: 'center',
                         }}
                       >
-                        <Typography variant="h6" color="primary" fontWeight={700}>
+                        <Typography variant="subtitle1" sx={{ color: 'primary.main', fontWeight: 700 }}>
                           ₹{product.price}
                         </Typography>
-                        <Typography
-                          variant="caption"
-                          color="text.secondary"
-                          sx={{ fontWeight: 600 }}
+                        <Box
+                          sx={{
+                            bgcolor: product.product_qty > 0 ? 'rgba(34, 197, 94, 0.16)' : 'rgba(255, 86, 48, 0.16)',
+                            color: product.product_qty > 0 ? '#118D57' : '#B71D18',
+                            px: 0.75,
+                            py: 0.25,
+                            borderRadius: 0.75,
+                            fontSize: '0.65rem',
+                            fontWeight: 700,
+                          }}
                         >
-                          Stock: {product.product_qty}
-                        </Typography>
+                          {product.product_qty > 0 ? `${product.product_qty}` : 'Out'}
+                        </Box>
                       </Box>
                     </Box>
                   </CardContent>
                 </CardActionArea>
-              </Card>
+              </ProductStyledCard>
             </Grid>
           ))
         ) : (
@@ -162,7 +149,7 @@ export const ProductCardLayout = ({
           onPageChange={onPageChange}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={onRowsPerPageChange}
-          rowsPerPageOptions={[15, 30, 45, 60]}
+          rowsPerPageOptions={[18, 36, 54, 72]}
         />
       </Box>
     </Container>
