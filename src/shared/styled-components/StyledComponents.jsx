@@ -16,13 +16,13 @@ export const StyledCard = styled(Card)(({ theme }) => ({
 
 export const StyledTextField = styled(TextField)(({ theme }) => ({
   '& .MuiInputBase-input': {
-    color: 'primary.main',
+    color: 'black',
   },
   '& .MuiInputLabel-root': {
-    color: 'primary.main',
+    color: 'black',
   },
   '& .MuiInputLabel-root.Mui-focused': {
-    color: 'primary.main',
+    color: 'black',
   },
   '& .MuiOutlinedInput-root': {
     borderRadius: theme.spacing(1),
@@ -31,10 +31,10 @@ export const StyledTextField = styled(TextField)(({ theme }) => ({
       transition: theme.transitions.create(['border-color', 'border-width']),
     },
     '&:hover fieldset': {
-      borderColor: 'primary.main',
+      borderColor: 'black',
     },
     '&.Mui-focused fieldset': {
-      borderColor: 'primary.main',
+      borderColor: 'black',
       borderWidth: '2px',
     },
   },

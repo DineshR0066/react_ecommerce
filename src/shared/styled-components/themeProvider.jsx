@@ -18,9 +18,36 @@ export const ThemeProvider = ({ children }) => {
   };
 
   const theme = useMemo(() => {
+    const p = palette(mode);
     return createTheme({
-      palette: palette(mode),
+      palette: p,
       typography,
+      components: {
+        MuiCssBaseline: {
+          styleOverrides: {
+            '*': {
+              scrollbarWidth: 'thin',
+              scrollbarColor: `${p.primary.light} transparent`,
+            },
+            '*::-webkit-scrollbar': {
+              width: '8px',
+              height: '8px',
+            },
+            '*::-webkit-scrollbar-track': {
+              background: 'transparent',
+            },
+            '*::-webkit-scrollbar-thumb': {
+              backgroundColor: p.primary.light,
+              borderRadius: '8px',
+              border: '2px solid transparent',
+              backgroundClip: 'content-box',
+            },
+            '*::-webkit-scrollbar-thumb:hover': {
+              backgroundColor: p.primary.main,
+            },
+          },
+        },
+      },
     });
   }, [mode]);
 
