@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { Search } from '@mui/icons-material';
 import { AdminTableLayout, useGetAdminQuery, useSearchUserQuery } from '../../../shared';
+import { StatusLabel, StyledTextField } from '../../../shared/styled-components/StyledComponents';
 
 export const AdminDashboard = () => {
   const { data: adminData } = useGetAdminQuery();
@@ -58,18 +59,18 @@ export const AdminDashboard = () => {
         </Typography>
       ),
     },
-    { key: 'email', label: 'Email' },
+    { key: 'email', label: 'Email' , render: (row) => (
+      <Typography variant="body2" sx={{ textTransform: 'none' }}>
+        {row.email}
+      </Typography>
+    )},
     {
       key: 'role',
       label: 'Role',
       render: (row) => (
-        <Chip
-          label={row.role}
-          size="small"
-          color={row.role === 'seller' ? 'primary' : 'success'}
-          variant="outlined"
-          sx={{ textTransform: 'capitalize', fontWeight: 500 }}
-        />
+        <StatusLabel color={row.role === 'seller' ? 'primary' : 'success'}>
+          {row.role}
+        </StatusLabel>
       ),
     },
   ];
@@ -77,7 +78,7 @@ export const AdminDashboard = () => {
   const searchHeader = (
     <Box sx={{ p: 2.5, borderBottom: '1px solid', borderColor: 'divider' }}>
       <Box component="form" onSubmit={handleSearch} sx={{ display: 'flex', gap: 2 }}>
-        <TextField
+        <StyledTextField
           fullWidth
           placeholder="Search ..."
           variant="outlined"
@@ -90,7 +91,7 @@ export const AdminDashboard = () => {
           startIcon={isFetching ? <CircularProgress size={20} color="inherit" /> : <Search />}
           type="submit"
           disabled={isFetching || !city.trim()}
-          sx={{ textTransform: 'none', px: 3, whiteSpace: 'nowrap' }}
+          sx={{ textTransform: 'none', px: 3, whiteSpace: 'nowrap', fontWeight: 700, boxShadow: 'none' }}
         >
           Search
         </Button>

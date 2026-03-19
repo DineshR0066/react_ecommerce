@@ -13,6 +13,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import { Catalog } from './Catalog';
 import { FilterDrawer } from './FilterDrawer';
 import { useGetAllCategoryQuery } from '../../../shared';
+import { StyledTextField } from '../../../shared/styled-components/StyledComponents';
 
 export const Search = () => {
   const [input, setInput] = useState('');
@@ -37,23 +38,19 @@ export const Search = () => {
   };
 
   return (
-    <Box sx={{ p: 2 }}>
-      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mb: 2 }}>
-        <TextField
+    <Box sx={{ py: 3, px: 0 }}>
+      <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mb: 3 }}>
+        <StyledTextField
           fullWidth
-          label="Search products"
+          placeholder="Search products..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
           InputProps={{
-            sx: {
-              borderRadius: 10,
-            },
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleSearch}>
-                  <SearchIcon />
-                </IconButton>
+            sx: { borderRadius: 1.5 },
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchIcon sx={{ color: 'text.disabled', width: 20, height: 20 }} />
               </InputAdornment>
             ),
           }}

@@ -8,6 +8,8 @@ import {
   DeleteDialog,
   SnackBar,
 } from '../../../shared';
+import { Box, Typography, alpha } from '@mui/material';
+import { StatusLabel } from '../../../shared/styled-components/StyledComponents';
 
 export const Order = () => {
   const [page, setPage] = useState(0);
@@ -61,10 +63,17 @@ export const Order = () => {
       key: 'Product_img',
       label: 'Image',
       render: (row) => (
-        <img
+        <Box
+          component="img"
           src={row.product_image_url}
-          alt="product"
-          style={{ height: '100px', width: '100px', objectFit: 'cover' }}
+          alt={row.product_name}
+          sx={{
+            height: 64,
+            width: 64,
+            borderRadius: 1.5,
+            objectFit: 'cover',
+            border: (theme) => `1px solid ${theme.palette.divider}`,
+          }}
         />
       ),
     },
@@ -75,30 +84,56 @@ export const Order = () => {
     {
       key: 'product_price',
       label: 'Product Price',
+      render: (row) => (
+        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+          ₹{Number(row.product_price).toLocaleString()}
+        </Typography>
+      ),
     },
     {
       key: 'freight_value',
-      label: 'Freight value',
+      label: 'Freight',
+      render: (row) => (
+        <Typography variant="body2" color="text.secondary">
+          ₹{Number(row.freight_value).toLocaleString()}
+        </Typography>
+      ),
     },
     {
       key: 'total_price',
       label: 'Price',
       render: (row) => {
-        const total = (row.product_price || 0) + (row.freight_value || 0);
-        return `₹ ${total.toFixed(2)}`;
+        const total = (Number(row.product_price) || 0) + (Number(row.freight_value) || 0);
+        return (
+          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
+            ₹{total.toLocaleString()}
+          </Typography>
+        );
       },
     },
     {
       key: 'status',
       label: 'Status',
+      render: (row) => {
+        const getStatusColor = (status) => {
+          switch (status?.toLowerCase()) {
+            case 'delivered': return 'success';
+            case 'shipped': return 'info';
+            case 'processing': return 'warning';
+            case 'cancelled': return 'error';
+            default: return 'default';
+          }
+        };
+        return (
+          <StatusLabel color={getStatusColor(row.status)}>
+            {row.status}
+          </StatusLabel>
+        );
+      },
     },
     {
       key: 'payment_type',
       label: 'Payment',
-    },
-    {
-      key: 'Installation',
-      label: 'Installation',
     },
     {
       key: 'action',
@@ -106,12 +141,20 @@ export const Order = () => {
       render: (row) => {
         return (
           <Button
-            variant="outlined"
+            variant="soft"
+            size="small"
             color="error"
             onClick={() => handleCancel(row)}
             disabled={row.status === 'cancelled' || row.status === 'delivered'}
+            sx={{ 
+              textTransform: 'none', 
+              fontWeight: 700,
+              bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
+              '&:hover': { bgcolor: (theme) => alpha(theme.palette.error.main, 0.16) },
+              '&.Mui-disabled': { bgcolor: 'action.disabledBackground' }
+            }}
           >
-            Cancel
+            Cancel Order
           </Button>
         );
       },

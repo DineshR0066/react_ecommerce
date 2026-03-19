@@ -17,7 +17,7 @@ export const Catalog = ({ searchTerm, selectedCategory, filters }) => {
   useEffect(() => {
     setPage(0);
   }, [searchTerm, selectedCategory, filters]);
-  const [rowsPerPage, setRowsPerPage] = useState(15);
+  const [rowsPerPage, setRowsPerPage] = useState(18);
   const [isBuyDialogOpen, setIsBuyDialogOpen] = useState(false);
   const [isDetailsDialogOpen, setIsDetailsDialogOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);

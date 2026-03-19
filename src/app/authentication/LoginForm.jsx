@@ -1,22 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { FaUser, FaLock } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import {
-  Button,
-  Card,
-  CardContent,
   Stack,
   Typography,
   Link as MuiLink,
-  TextField,
   Box,
 } from '@mui/material';
 import { SnackBar, useLoginMutation } from '../../shared';
+import { StyledCard, StyledTextField, AuthButton } from '../../shared/styled-components/StyledComponents';
 
 export const LoginForm = () => {
-  // const [error, setError] = useState("");
-
   const {
     register,
     handleSubmit,
@@ -54,124 +48,88 @@ export const LoginForm = () => {
       localStorage.setItem('user_id', res.user.user_id);
       const role = res.user.role;
 
-      console.log('Login success:', res);
-      setSnackMessage('login successfull');
+      setSnackMessage('Login successful');
       setSnackSeverity('success');
       setSnackOpen(true);
 
       setTimeout(() => {
-        if (role === 'seller') {
-          navigate('/seller/seller-profile');
-        }
-        if (role === 'customer') {
-          navigate('/customer/search');
-        }
-        if (role === 'admin') {
-          navigate('/admin');
-        }
+        if (role === 'seller') navigate('/seller/seller-profile');
+        if (role === 'customer') navigate('/customer/search');
+        if (role === 'admin') navigate('/admin');
       }, 1000);
     } catch (err) {
       console.error(err);
-      // setError("Invalid");
-      setSnackMessage('login failed');
+      setSnackMessage('Login failed');
       setSnackSeverity('error');
       setSnackOpen(true);
     }
   };
 
-  const textStyle = {
-    '& .MuiInputBase-input': {
-      color: 'black',
-    },
-    '& .MuiInputLabel-root': {
-      color: 'black',
-    },
-    '& .MuiInputLabel-root.Mui-focused': {
-      color: 'black',
-    },
-    '& .MuiOutlinedInput-root': {
-      '& fieldset': {
-        borderColor: 'black',
-        borderWidth: '1px', // default
-      },
-      '&:hover fieldset': {
-        borderColor: 'black',
-        borderWidth: '2px', // 👈 thicker on hover
-      },
-      '&.Mui-focused fieldset': {
-        borderColor: 'black',
-        borderWidth: '2px', // 👈 thicker on focus
-      },
-    },
-  };
-
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}>
-      <Card
-        sx={{
-          p: 4,
-          borderRadius: 12,
-          background: 'rgba(229, 216, 234, 0.92)',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.3)',
-        }}
-      >
-        <CardContent>
-          <Typography variant="h3" align="center" color="black" fontWeight="bold">
-            LOGIN
-          </Typography>
+    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+      <StyledCard sx={{ width: '100%', maxWidth: 480 }}>
+        <Typography variant="h3" align="center" color="#161C24" fontWeight={800} gutterBottom>
+          Login
+        </Typography>
 
-          {/* {error && <Typography color="error" align="center">{error}</Typography>} */}
+        <Typography variant="body2" align="center" color="#637381" sx={{ mb: 4 }}>
+          Enter your details below to continue.
+        </Typography>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Stack spacing={3} sx={{ mt: 2 }}>
-              <TextField
-                label="Email"
-                variant="outlined"
-                fullWidth
-                {...register('email', { required: 'Email is required' })}
-                error={!!errors.email}
-                helperText={errors.email?.message}
-                sx={textStyle}
-              />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Stack spacing={3}>
+            <StyledTextField
+              label="Email address"
+              variant="outlined"
+              fullWidth
+              {...register('email', { required: 'Email is required' })}
+              error={!!errors.email}
+              helperText={errors.email?.message}
+            />
 
-              <TextField
-                label="Password"
-                type="password"
-                variant="outlined"
-                fullWidth
-                {...register('password', { required: 'Password is required' })}
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                sx={textStyle}
-              />
+            <StyledTextField
+              label="Password"
+              type="password"
+              variant="outlined"
+              fullWidth
+              {...register('password', { required: 'Password is required' })}
+              error={!!errors.password}
+              helperText={errors.password?.message}
+            />
 
-              <Box sx={{ textAlign: 'right' }}>
-                <MuiLink component={Link} to="/forgot-password" variant="body2">
-                  Forgot Password?
-                </MuiLink>
-              </Box>
-
-              <Button
-                variant="contained"
-                type="submit"
-                size="large"
-                fullWidth
-                sx={{ py: 1.5, borderRadius: 2 }}
+            <Box sx={{ textAlign: 'right' }}>
+              <MuiLink 
+                component={Link} 
+                to="/forgot-password" 
+                variant="body2" 
+                sx={{ color: 'primary.main', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
               >
-                {' '}
-                Login
-              </Button>
+                Forgot password?
+              </MuiLink>
+            </Box>
 
-              <Typography variant="body2" align="center" color="black">
-                Don't have an account?{' '}
-                <MuiLink component={Link} to="/signup" fontWeight="bold">
-                  Signup
-                </MuiLink>
-              </Typography>
-            </Stack>
-          </form>
-        </CardContent>
-      </Card>
+            <AuthButton
+              variant="contained"
+              type="submit"
+              size="large"
+              fullWidth
+            >
+              Login
+            </AuthButton>
+
+            <Typography variant="body2" align="center" color="#637381">
+              Don't have an account?{' '}
+              <MuiLink 
+                component={Link} 
+                to="/signup" 
+                sx={{ color: 'primary.main', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+              >
+                Get started
+              </MuiLink>
+            </Typography>
+          </Stack>
+        </form>
+      </StyledCard>
       <SnackBar
         open={snackOpen}
         message={snackMessage}
