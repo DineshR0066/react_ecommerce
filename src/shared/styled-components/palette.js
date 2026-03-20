@@ -4,7 +4,7 @@ export const palette = (mode) => ({
   primary: {
     lighter: '#E9D1FB',
     light: '#B88FF6',
-    main: mode === 'light' ? '#761fc2' : '#8146bc',
+    main: mode === 'light' ? '#4f7c82' : '#B8e3e9',
     dark: '#4C0E96',
     darker: '#29056B',
     contrastText: '#ffffff',

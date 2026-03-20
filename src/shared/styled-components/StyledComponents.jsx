@@ -57,7 +57,7 @@ export const AuthButton = styled(Button)(({ theme }) => ({
 
 export const ProductStyledCard = styled(Card)(({ theme }) => ({
   height: 300,
-  width: 180,
+  width: 250,
   display: 'flex',
   flexDirection: 'column',
   borderRadius: theme.spacing(2),

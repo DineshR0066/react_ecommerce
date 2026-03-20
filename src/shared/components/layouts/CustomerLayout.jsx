@@ -41,7 +41,7 @@ export const CustomerLayout = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
+      <AppBar position="fixed" sx={{ backgroundColor: '#4f7c82'}}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
             Ecommerce
@@ -74,7 +74,7 @@ export const CustomerLayout = () => {
             ) : (
               <Button
                 variant="contained"
-                color="success"
+                color='#80ed99'
                 onClick={() => navigate('/login')}
                 sx={{ ml: 2 }}
               >
@@ -84,7 +84,7 @@ export const CustomerLayout = () => {
           </Box>
         </Toolbar>
       </AppBar>
-      <Container maxWidth={false} sx={{ mt: 4, px: 0 }}>
+      <Container maxWidth={false} sx={{ mt: 4, pt: 4 }}>
         <Outlet />
       </Container>
     </Box>
