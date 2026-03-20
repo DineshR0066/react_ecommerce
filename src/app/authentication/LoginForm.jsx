@@ -67,7 +67,7 @@ export const LoginForm = () => {
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <StyledCard sx={{ width: '100%', maxWidth: 480 }}>
+      <StyledCard sx={{ width: '100%', maxWidth: 400 }}>
         <Typography variant="h3" align="center" color="#161C24" fontWeight={800} gutterBottom>
           Login
         </Typography>

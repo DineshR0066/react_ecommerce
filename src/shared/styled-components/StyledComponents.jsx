@@ -94,5 +94,3 @@ export const StatusLabel = styled(Box)(({ theme, color = 'info' }) => {
     textTransform: 'capitalize',
   };
 });
-
-

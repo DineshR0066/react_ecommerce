@@ -66,7 +66,7 @@ export const ForgotPassword = () => {
             <Box sx={{ textAlign: 'center' }}>
               <MuiLink 
                 component={Link} 
-                to="/" 
+                to="/login" 
                 sx={{ color: 'primary.main', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
               >
                 Return to login

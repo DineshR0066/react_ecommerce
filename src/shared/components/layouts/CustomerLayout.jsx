@@ -57,9 +57,6 @@ export const CustomerLayout = () => {
                 {item.text}
               </Button>
             ))}
-            {/* <IconButton onClick={toggleTheme} color="inherit" sx={{ ml: 1 }}>
-                            {mode === "dark" ? <Brightness7 /> : <Brightness4 />}
-                        </IconButton> */}
             <ThemeToggle />
             {isCustomer ? (
               <Button

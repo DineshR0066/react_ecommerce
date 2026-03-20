@@ -10,7 +10,7 @@ export const AuthLayout = ({ children }) => {
         width: '100%',
         display: 'flex',
         flexDirection: { xs: 'column', md: 'row' },
-        backgroundImage: `linear-gradient(rgba(244, 246, 248, 0.8), rgba(244, 246, 248, 0.9)), url(${bgImage})`,
+        backgroundImage: `linear-gradient(rgba(244, 246, 248, 0.8), rgba(127, 177, 227, 0.9)), url(${bgImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',

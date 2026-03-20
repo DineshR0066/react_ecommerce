@@ -17,7 +17,6 @@ import { ThemeToggle } from '../../styled-components';
 export const DrawerLayout = ({ title, menuItems, handleLogout, isDesktop, handleDrawerToggle }) => {
   return (
     <Box sx={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      {/* TOP HEADER */}
       <Toolbar
         sx={{
           display: 'flex',
@@ -25,17 +24,15 @@ export const DrawerLayout = ({ title, menuItems, handleLogout, isDesktop, handle
           alignItems: 'center',
         }}
       >
-        <Typography variant="h6" color="primary" fontWeight="bold" noWrap>
+        <Typography variant="h4" color="primary" fontWeight="bold" noWrap>
           {title}
         </Typography>
 
-        {/* THEME TOGGLE HERE */}
         <ThemeToggle />
       </Toolbar>
 
       <Divider />
 
-      {/* SIDEBAR CONTENT */}
       <Box
         sx={{
           flexGrow: 1,
@@ -44,7 +41,6 @@ export const DrawerLayout = ({ title, menuItems, handleLogout, isDesktop, handle
           justifyContent: 'space-between',
         }}
       >
-        {/* MENU ITEMS */}
         <List>
           {menuItems.map((item) => (
             <ListItem key={item.text} disablePadding>
@@ -71,8 +67,6 @@ export const DrawerLayout = ({ title, menuItems, handleLogout, isDesktop, handle
             </ListItem>
           ))}
         </List>
-
-        {/* LOGOUT AT BOTTOM */}
         <Box>
           <Divider />
 
