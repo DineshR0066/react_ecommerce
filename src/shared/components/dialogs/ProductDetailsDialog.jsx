@@ -26,10 +26,11 @@ export const ProductDetailsDialog = ({ open, onClose, product, onAddToCart, onBu
               component="img"
               sx={{
                 width: '100%',
-                height: 'auto',
+                height: 350,
                 borderRadius: 2,
                 boxShadow: 2,
                 objectFit: 'cover',
+                display: 'block',
               }}
               src={product.product_image_url || 'https://via.placeholder.com/300'}
               alt={product.product_name}

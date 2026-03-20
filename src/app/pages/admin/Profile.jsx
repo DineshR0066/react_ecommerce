@@ -1,5 +1,14 @@
+import React, { useState } from 'react';
 import { Email, LocationOn, Map, Home } from '@mui/icons-material';
-import { ProfileLayout, useGetAdminQuery } from '../../../shared';
+import { Box, Button } from '@mui/material';
+import { 
+  ProfileLayout, 
+  useGetAdminQuery, 
+  useEditProfileMutation,
+  useDeleteAddressMutation,
+  EditProfileDialog,
+  SnackBar 
+} from '../../../shared';
 
 export const AdminProfile = () => {
   const { data, error, isLoading } = useGetAdminQuery();

@@ -7,7 +7,7 @@ export const sellerApi = baseApi.injectEndpoints({
         url: '/sellers',
         method: 'GET',
       }),
-      providesTags: ['Products'],
+      providesTags: ['Products', 'User'],
     }),
 
     getProducts: builder.query({

@@ -78,7 +78,6 @@ export const typography = {
     fontSize: '0.875rem',
     fontWeight: 400,
     lineHeight: 1.6,
-    textTransform: 'capitalize',
   },
 
   // Secondary body text - descriptions, table data

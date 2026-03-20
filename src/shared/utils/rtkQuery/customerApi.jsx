@@ -7,7 +7,7 @@ export const customerApi = baseApi.injectEndpoints({
         url: '/users',
         method: 'GET',
       }),
-      providesTags: ['customers'],
+      providesTags: ['customers', 'User'],
     }),
 
     getAllProducts: builder.query({
@@ -107,7 +107,7 @@ export const customerApi = baseApi.injectEndpoints({
         method: 'PATCH',
         body: { data },
       }),
-      invalidatesTags: ['customers'],
+      invalidatesTags: ['customers', 'User'],
     }),
 
     addAddress: builder.mutation({
@@ -116,7 +116,7 @@ export const customerApi = baseApi.injectEndpoints({
         method: 'PATCH',
         body: { data },
       }),
-      invalidatesTags: ['customers'],
+      invalidatesTags: ['customers', 'User'],
     }),
 
     deleteAddress: builder.mutation({
@@ -125,7 +125,7 @@ export const customerApi = baseApi.injectEndpoints({
         method: 'PATCH',
         body: { data },
       }),
-      invalidatesTags: ['customers'],
+      invalidatesTags: ['customers', 'User'],
     }),
 
     updateCart: builder.mutation({

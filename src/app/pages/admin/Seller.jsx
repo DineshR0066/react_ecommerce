@@ -24,6 +24,7 @@ import {
   useGetAllSellerQuery,
   useDeleteSellerMutation,
   useAddSellerMutation,
+  SnackBar,
 } from '../../../shared';
 
 export const Sellers = () => {
@@ -39,6 +40,10 @@ export const Sellers = () => {
     limit: rowsPerPage,
   });
   const [addSeller, { isLoading: isAdding }] = useAddSellerMutation();
+
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackMessage, setSnackMessage] = useState('');
+  const [snackSeverity, setSnackSeverity] = useState('success');
 
   const {
     register,
@@ -68,9 +73,15 @@ export const Sellers = () => {
         zip_code: Number(formData.zip_code),
       };
       await addSeller(payload).unwrap();
+      setSnackMessage('Seller added successfully');
+      setSnackSeverity('success');
+      setSnackOpen(true);
       handleClose();
     } catch (err) {
       console.error('Failed to add seller', err);
+      setSnackMessage('Failed to add seller');
+      setSnackSeverity('error');
+      setSnackOpen(true);
     }
   };
 
@@ -82,8 +93,14 @@ export const Sellers = () => {
   const handleDeleteConfirm = async () => {
     try {
       await deleteSeller(sellerToDelete).unwrap();
+      setSnackMessage('Seller deleted successfully');
+      setSnackSeverity('success');
+      setSnackOpen(true);
     } catch (err) {
       console.error('Failed to delete seller', err);
+      setSnackMessage('Failed to delete seller');
+      setSnackSeverity('error');
+      setSnackOpen(true);
     } finally {
       setDeleteDialogOpen(false);
       setSellerToDelete(null);
@@ -248,6 +265,12 @@ export const Sellers = () => {
         description="Are you sure you want to delete this seller?"
         confirmText="Delete Seller"
         cancelText="Cancel"
+      />
+      <SnackBar
+        open={snackOpen}
+        message={snackMessage}
+        severity={snackSeverity}
+        handleClose={() => setSnackOpen(false)}
       />
     </>
   );

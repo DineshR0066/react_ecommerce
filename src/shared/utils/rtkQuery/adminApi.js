@@ -1,4 +1,4 @@
-import { baseApi } from './baseApi';
+      import { baseApi } from './baseApi';
 
 export const adminApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -15,6 +15,7 @@ export const adminApi = baseApi.injectEndpoints({
         url: `/admin`,
         method: 'GET',
       }),
+      providesTags: ['User'],
     }),
     getAllCustomer: builder.query({
       query: ({ limit = 10, page = 1 }) => ({
