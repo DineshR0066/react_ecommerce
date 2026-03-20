@@ -5,6 +5,7 @@ import {
   useUpdateProductMutation,
   useAddProductMutation,
   AdminTableLayout,
+  DeleteDialog,
   SnackBar,
 } from '../../../shared';
 import { useForm } from 'react-hook-form';
@@ -38,6 +39,9 @@ export const Products = () => {
   const [open, setOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentPid, setCurrentPid] = useState(null);
+
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
 
   const {
     register,
@@ -145,7 +149,10 @@ export const Products = () => {
             size="small"
             variant="soft"
             color="error"
-            onClick={() => handleDelete(row.product_id)}
+            onClick={() => {
+              setSelectedProductId(row.product_id);
+              setIsDeleteDialogOpen(true);
+            }}
             sx={{ 
               textTransform: 'none', 
               fontWeight: 700,
@@ -160,16 +167,23 @@ export const Products = () => {
     },
   ];
 
-  const handleDelete = async (pid) => {
+  const handleConfirmDelete = async () => {
     const user_id = localStorage.getItem('user_id');
     try {
       await deleteProduct({
         sid: user_id,
-        pid: pid,
+        pid: selectedProductId,
       }).unwrap();
-      console.log('Deleted product:', pid);
+      setSnackMessage('Product deleted successfully');
+      setSnackSeverity('success');
+      setSnackOpen(true);
+      setIsDeleteDialogOpen(false);
+      setSelectedProductId(null);
     } catch (err) {
       console.error('Delete failed', err);
+      setSnackMessage('Failed to delete product');
+      setSnackSeverity('error');
+      setSnackOpen(true);
     }
   };
 
@@ -442,6 +456,15 @@ export const Products = () => {
         </DialogActions>
       </Dialog>
 
+      <DeleteDialog
+        open={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Product"
+        description="Are you sure you want to delete this product? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
       <SnackBar
         open={snackOpen}
         message={snackMessage}
