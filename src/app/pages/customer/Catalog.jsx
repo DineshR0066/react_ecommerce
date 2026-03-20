@@ -72,7 +72,8 @@ export const Catalog = ({ searchTerm, selectedCategory, filters }) => {
 
   const handleBuy = (product) => {
     const userRole = localStorage.getItem('role');
-    if (userRole !== 'customer') {
+    const userId = localStorage.getItem('user_id')
+    if (!userId && userRole !== 'customer') {
       navigate('/login');
       return;
     }
@@ -86,12 +87,12 @@ export const Catalog = ({ searchTerm, selectedCategory, filters }) => {
   };
 
   const handleAddToCart = async (product_id) => {
+    const uid = localStorage.getItem('user_id')
     const userRole = localStorage.getItem('role');
-    if (userRole !== 'customer') {
+    if (!uid && userRole !== 'customer') {
       navigate('/login');
       return;
     }
-    const uid = localStorage.getItem('user_id');
     try {
       await addToCart({ uid: uid, pid: product_id });
       // navigate("/customer/cart")

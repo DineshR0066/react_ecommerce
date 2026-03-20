@@ -33,15 +33,21 @@ export const CustomerProfile = () => {
   const [snackMessage, setSnackMessage] = useState('');
   const [snackSeverity, setSnackSeverity] = useState('success');
 
+  const lastAddress = data?.addresses?.[data.addresses.length - 1];
+  const addressDisplay = lastAddress
+    ? `${lastAddress.address_line}, ${lastAddress.city}, ${lastAddress.state} ${lastAddress.zip_code}`
+    : 'No address saved';
+
   const fields = [
     { icon: <Email color="primary" />, label: 'Email Address', value: data?.email },
     {
       icon: <Home color="primary" />,
       label: 'Address',
-      value: `${data?.addresses?.length || 0} saved`,
+      value: addressDisplay,
     },
   ];
 
+  const [addAddress] = useAddAddressMutation();
   const [deleteAddress] = useDeleteAddressMutation();
 
   const [newAddress, setNewAddress] = useState({
@@ -76,6 +82,40 @@ export const CustomerProfile = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleAddAddress = async () => {
+    const uid = localStorage.getItem("user_id");
+
+    try {
+      if (!newAddress.address_line || !newAddress.city || !newAddress.state || !newAddress.zip_code) {
+        setSnackMessage("Please fill all fields");
+        setSnackSeverity("error");
+        setSnackOpen(true);
+        return;
+      } else {
+        await addAddress({
+          uid,
+          data: newAddress
+        }).unwrap();
+
+        setSnackMessage("Address added");
+        setSnackSeverity("success");
+        setSnackOpen(true);
+
+        setNewAddress({
+          address_line: "",
+          city: "",
+          state: "",
+          zip_code: ""
+        });
+      }
+
+    } catch (err) {
+      setSnackMessage("Failed to add address");
+      setSnackSeverity("error");
+      setSnackOpen(true);
+    }
   };
 
   const handleDeleteAddress = async (id) => {
@@ -188,7 +228,7 @@ export const CustomerProfile = () => {
             </Box>
           ))}
 
-          <Typography variant="subtitle1" sx={{ mt: 2 }}>
+          <Typography variant="subtitle1" sx={{ mt: 2 }} onClick={() => handleAddAddress()}>
             Add New Address
           </Typography>
 
