@@ -7,12 +7,22 @@ import {
   useDeleteAddressMutation,
   SnackBar,
   ProfileLayout,
-  EditProfileDialog,
 } from '../../../shared';
 import { Email, LocationOn, Home, Map } from '@mui/icons-material';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { BarChart } from '@mui/x-charts/BarChart';
-import { Box, Button, Paper, Typography } from '@mui/material';
+import {
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+} from '@mui/material';
 
 export const CustomerProfile = () => {
   const { data, error, isLoading } = useCustomerDetailsQuery();
@@ -23,35 +33,142 @@ export const CustomerProfile = () => {
   const [snackMessage, setSnackMessage] = useState('');
   const [snackSeverity, setSnackSeverity] = useState('success');
 
+  const lastAddress = data?.addresses?.[data.addresses.length - 1];
+  const addressDisplay = lastAddress
+    ? `${lastAddress.address_line}, ${lastAddress.city}, ${lastAddress.state} ${lastAddress.zip_code}`
+    : 'No address saved';
+
   const fields = [
     { icon: <Email color="primary" />, label: 'Email Address', value: data?.email },
     {
       icon: <Home color="primary" />,
       label: 'Address',
-      value: `${data?.addresses?.length || 0} saved`,
+      value: addressDisplay,
     },
   ];
 
+  const [addAddress] = useAddAddressMutation();
   const [deleteAddress] = useDeleteAddressMutation();
+
+  const [newAddress, setNewAddress] = useState({
+    address_line: '',
+    city: '',
+    state: '',
+    zip_code: '',
+  });
 
   const [openEdit, setOpenEdit] = useState(false);
 
+  const [formData, setFormData] = useState({
+    email: '',
+  });
+
   const handleEditOpen = () => {
+    setFormData({
+      email: data?.email || '',
+    });
+
     setOpenEdit(true);
   };
 
   const handleClose = () => {
     setOpenEdit(false);
   };
-  const handleDeleteAddress = async (addressId) => {
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleAddAddress = async () => {
+    const uid = localStorage.getItem("user_id");
+
     try {
-      const uid = localStorage.getItem('user_id');
-      await deleteAddress({ uid, data: { _id: addressId } }).unwrap();
-      setSnackMessage('Address deleted successfully');
+      if (!newAddress.address_line || !newAddress.city || !newAddress.state || !newAddress.zip_code) {
+        setSnackMessage("Please fill all fields");
+        setSnackSeverity("error");
+        setSnackOpen(true);
+        return;
+      } else {
+        await addAddress({
+          uid,
+          data: newAddress
+        }).unwrap();
+
+        setSnackMessage("Address added");
+        setSnackSeverity("success");
+        setSnackOpen(true);
+
+        setNewAddress({
+          address_line: "",
+          city: "",
+          state: "",
+          zip_code: ""
+        });
+      }
+
+    } catch (err) {
+      setSnackMessage("Failed to add address");
+      setSnackSeverity("error");
+      setSnackOpen(true);
+    }
+  };
+
+  const handleDeleteAddress = async (id) => {
+    const uid = localStorage.getItem('user_id');
+
+    try {
+      await deleteAddress({ uid, data: { _id: id } }).unwrap();
+
+      setSnackMessage('Address deleted');
       setSnackSeverity('success');
       setSnackOpen(true);
     } catch (err) {
-      setSnackMessage(err?.data?.message || 'Delete failed');
+      setSnackMessage('Delete failed');
+      setSnackSeverity('error');
+      setSnackOpen(true);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const uid = localStorage.getItem('user_id');
+      console.log(formData);
+      if (
+        newAddress.address_line == '' ||
+        newAddress.city == '' ||
+        newAddress.state == '' ||
+        newAddress.zip_code == ''
+      ) {
+        setSnackMessage('Fill all the feilds');
+        setSnackSeverity('error');
+        setSnackOpen(true);
+        return;
+      }
+      await editProfile({
+        uid: uid,
+        data: {
+          email: formData.email,
+          addresses: [...data.addresses, newAddress],
+        },
+      }).unwrap();
+      setNewAddress({
+        address_line: '',
+        city: '',
+        state: '',
+        zip_code: '',
+      });
+      setOpenEdit(false);
+      setSnackMessage('edited sucessfully');
+      setSnackSeverity('success');
+      setSnackOpen(true);
+    } catch (err) {
+      console.error('Profile update failed:', err);
+      setSnackMessage(err.data.message);
       setSnackSeverity('error');
       setSnackOpen(true);
     }
@@ -65,31 +182,95 @@ export const CustomerProfile = () => {
         </Button>
       </Box>
       <ProfileLayout data={data} isLoading={isLoading} isError={!!error} fields={fields} />
-      <EditProfileDialog
-        open={openEdit}
-        onClose={handleClose}
-        userType="customer"
-        initialData={data}
-        onSave={async ({ email, newAddress }) => {
-          try {
-            const uid = localStorage.getItem('user_id');
-            const dataToSubmit = {
-              email,
-              addresses: newAddress ? [...data.addresses, newAddress] : data.addresses,
-            };
-            await editProfile({ uid, data: dataToSubmit }).unwrap();
-            setOpenEdit(false);
-            setSnackMessage('Profile updated successfully');
-            setSnackSeverity('success');
-            setSnackOpen(true);
-          } catch (err) {
-            setSnackMessage(err?.data?.message || 'Update failed');
-            setSnackSeverity('error');
-            setSnackOpen(true);
-          }
-        }}
-        onDeleteAddress={handleDeleteAddress}
-      />
+      <Dialog open={openEdit} onClose={handleClose} maxWidth="sm" fullWidth>
+        <DialogTitle>Edit Profile</DialogTitle>
+
+        <DialogContent
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            mt: 1,
+            maxHeight: '70vh',
+            overflowY: 'auto',
+          }}
+        >
+          <TextField
+            label="Email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            fullWidth
+          />
+
+          <Typography variant="h6" sx={{ mt: 2 }}>
+            Addresses
+          </Typography>
+
+          {data?.addresses?.map((addr) => (
+            <Box
+              key={addr._id}
+              sx={{
+                p: 1.5,
+                mt: 1,
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 2,
+              }}
+            >
+              <Typography variant="body2">
+                {addr.address_line}, {addr.city}, {addr.state} - {addr.zip_code}
+              </Typography>
+
+              <Button size="small" color="error" onClick={() => handleDeleteAddress(addr._id)}>
+                Delete
+              </Button>
+            </Box>
+          ))}
+
+          <Typography variant="subtitle1" sx={{ mt: 2 }} onClick={() => handleAddAddress()}>
+            Add New Address
+          </Typography>
+
+          <TextField
+            label="Address"
+            fullWidth
+            value={newAddress.address_line}
+            onChange={(e) => setNewAddress({ ...newAddress, address_line: e.target.value })}
+          />
+
+          <TextField
+            label="City"
+            fullWidth
+            value={newAddress.city}
+            onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+          />
+
+          <TextField
+            label="State"
+            fullWidth
+            value={newAddress.state}
+            onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+          />
+
+          <TextField
+            label="Zip Code"
+            fullWidth
+            value={newAddress.zip_code}
+            onChange={(e) => setNewAddress({ ...newAddress, zip_code: e.target.value })}
+          />
+        </DialogContent>
+
+        <DialogActions>
+          <Button variant="contained" onClick={handleClose}>
+            Cancel
+          </Button>
+
+          <Button variant="contained" onClick={handleSubmit}>
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Box sx={{ mt: 5, px: 2 }}>
         <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>

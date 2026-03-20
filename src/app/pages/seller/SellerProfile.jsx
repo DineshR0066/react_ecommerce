@@ -54,10 +54,10 @@ export const SellerProfile = () => {
         />
 
         <BarChart
-          xAxis={[{ scaleType: 'band', data: ['Revenue'] }]}
+          xAxis={[{ scaleType: 'band', data: ['Rupees'] }]}
           series={[
-            { data: [dashData?.totalRevenue || 0], label: 'Revenue ($)' },
-            { data: [dashData?.totalLoss || 0], label: 'Loss ($)' },
+            { data: [dashData?.totalRevenue || 0], label: 'Delivered ($)' },
+            { data: [dashData?.totalLoss || 0], label: 'Cancelled ($)' },
           ]}
           width={400}
           height={300}
