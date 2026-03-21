@@ -21,6 +21,7 @@ import AddIcon from '@mui/icons-material/Add';
 import {
   AdminTableLayout,
   DeleteDialog,
+  SnackBar,
   useGetAllSellerQuery,
   useDeleteSellerMutation,
   useAddSellerMutation,
@@ -32,6 +33,7 @@ export const Sellers = () => {
   const [open, setOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sellerToDelete, setSellerToDelete] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const [deleteSeller] = useDeleteSellerMutation();
   const { data, isLoading, isError } = useGetAllSellerQuery({
@@ -68,9 +70,11 @@ export const Sellers = () => {
         zip_code: Number(formData.zip_code),
       };
       await addSeller(payload).unwrap();
+      setSnackbar({ open: true, message: 'Seller added successfully!', severity: 'success' });
       handleClose();
     } catch (err) {
       console.error('Failed to add seller', err);
+      setSnackbar({ open: true, message: 'Failed to add seller', severity: 'error' });
     }
   };
 
@@ -82,8 +86,10 @@ export const Sellers = () => {
   const handleDeleteConfirm = async () => {
     try {
       await deleteSeller(sellerToDelete).unwrap();
+      setSnackbar({ open: true, message: 'Seller deleted successfully!', severity: 'success' });
     } catch (err) {
       console.error('Failed to delete seller', err);
+      setSnackbar({ open: true, message: 'Failed to delete seller', severity: 'error' });
     } finally {
       setDeleteDialogOpen(false);
       setSellerToDelete(null);
@@ -248,6 +254,12 @@ export const Sellers = () => {
         description="Are you sure you want to delete this seller?"
         confirmText="Delete Seller"
         cancelText="Cancel"
+      />
+      <SnackBar
+        open={snackbar.open}
+        message={snackbar.message}
+        severity={snackbar.severity}
+        handleClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
       />
     </>
   );
