@@ -14,74 +14,120 @@ import {
 } from '@mui/icons-material';
 import { useNavigate, Outlet } from 'react-router-dom';
 // import { ColorModeContext } from "../../../theme/themeProvider";
-import { ThemeToggle } from '../../styled-components';
+import { ThemeToggle, AuthButton } from '../../styled-components';
 
-export const CustomerLayout = () => {
+import { alpha, useScrollTrigger, Slide } from '@mui/material';
+
+function HideOnScroll(props) {
+  const { children } = props;
+  const trigger = useScrollTrigger();
+  return (
+    <Slide appear={false} direction="down" in={!trigger}>
+      {children}
+    </Slide>
+  );
+}
+
+export const CustomerLayout = (props) => {
   const navigate = useNavigate();
-
   const userRole = localStorage.getItem('role');
   const isCustomer = userRole === 'customer';
 
   const menuItems = [
-    { text: 'Home', icon: <Home />, path: '/customer/search' },
+    { text: 'DISCOVER', path: '/customer/search' },
     ...(isCustomer
       ? [
-          { text: 'Orders', icon: <Storefront />, path: '/customer/orders' },
-          { icon: <Person />, path: '/customer/customer-profile' },
-          { icon: <ShoppingCart />, path: '/customer/cart' },
+          { text: 'ACQUISITIONS', path: '/customer/orders' },
+          { text: 'PROFILE', path: '/customer/customer-profile' },
+          { text: 'COLLECTION', path: '/customer/cart' },
         ]
       : []),
   ];
 
-  const handleNavigate = (path) => {
-    navigate(path);
-  };
-
   const { handleLogout } = useLogout();
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
-            Ecommerce
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            {menuItems.map((item, index) => (
-              <Button
-                color="inherit"
-                key={item.path || index}
-                onClick={() => handleNavigate(item.path)}
-              >
-                {item.icon}
-                {item.text}
-              </Button>
-            ))}
-            <ThemeToggle />
-            {isCustomer ? (
-              <Button
-                variant="contained"
-                color="error"
-                startIcon={<Logout />}
-                onClick={handleLogout}
-                sx={{ ml: 2 }}
-              >
-                Logout
-              </Button>
-            ) : (
-              <Button
-                variant="contained"
-                color="success"
-                onClick={() => navigate('/login')}
-                sx={{ ml: 2 }}
-              >
-                Login
-              </Button>
-            )}
-          </Box>
-        </Toolbar>
-      </AppBar>
-      <Container maxWidth={false} sx={{ mt: 4, px: 0 }}>
+    <Box sx={{ flexGrow: 1, minHeight: '100vh', bgcolor: 'background.default' }}>
+      <HideOnScroll {...props}>
+        <AppBar 
+          position="fixed" 
+          sx={{ 
+            background: (theme) => alpha(theme.palette.background.default, 0.8),
+            backdropFilter: 'blur(20px)',
+            boxShadow: 'none',
+            borderBottom: '1px solid',
+            borderColor: 'divider',
+            color: 'text.primary',
+          }}
+        >
+          <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', height: 80 }}>
+            <Typography 
+              variant="h3" 
+              component="div" 
+              onClick={() => navigate('/')}
+              sx={{ 
+                cursor: 'pointer',
+                letterSpacing: '0.2em',
+                fontWeight: 700,
+                background: (theme) => `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.primary.light})`,
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              LUMINA
+            </Typography>
+
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: { md: 4 } }}>
+              <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 4 }}>
+                {menuItems.map((item) => (
+                  <Typography
+                    key={item.path}
+                    onClick={() => navigate(item.path)}
+                    sx={{ 
+                      cursor: 'pointer',
+                      fontSize: '0.75rem',
+                      fontWeight: 700,
+                      letterSpacing: '0.15em',
+                      color: 'text.secondary',
+                      transition: 'all 0.3s ease',
+                      '&:hover': { color: 'primary.main', transform: 'translateY(-2px)' }
+                    }}
+                  >
+                    {item.text}
+                  </Typography>
+                ))}
+              </Box>
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, ml: 4 }}>
+                <ThemeToggle />
+                {isCustomer ? (
+                  <Button
+                    variant="text"
+                    onClick={handleLogout}
+                    sx={{ 
+                      color: 'error.main', 
+                      fontWeight: 700,
+                      letterSpacing: '0.1em',
+                      fontSize: '0.75rem'
+                    }}
+                  >
+                    SIGN OUT
+                  </Button>
+                ) : (
+                  <AuthButton
+                    onClick={() => navigate('/login')}
+                    sx={{ px: 4, py: 1 }}
+                  >
+                    SIGN IN
+                  </AuthButton>
+                )}
+              </Box>
+            </Box>
+          </Toolbar>
+        </AppBar>
+      </HideOnScroll>
+      <Toolbar /> {/* Spacer */}
+      <Container maxWidth="xl" sx={{ mt: 4, pb: 10 }}>
         <Outlet />
       </Container>
     </Box>

@@ -13,126 +13,132 @@ import {
 } from '@mui/material';
 import { ShoppingCart, ShoppingBag } from '@mui/icons-material';
 
+import { 
+  AuthButton 
+} from '../../styled-components/StyledComponents';
+
 export const ProductDetailsDialog = ({ open, onClose, product, onAddToCart, onBuy }) => {
   if (!product) return null;
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle sx={{ fontWeight: 700 }}>Product Details</DialogTitle>
-      <DialogContent dividers>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      fullWidth 
+      maxWidth="md"
+      PaperProps={{
+        sx: { 
+          borderRadius: '32px', 
+          overflow: 'hidden',
+          background: 'rgba(255, 255, 255, 0.95)',
+          backdropFilter: 'blur(20px)'
+        }
+      }}
+    >
+      <DialogContent sx={{ p: 0 }}>
+        <Grid container>
+          <Grid item xs={12} md={6}>
             <Box
               component="img"
               sx={{
                 width: '100%',
-                height: 'auto',
-                borderRadius: 2,
-                boxShadow: 2,
+                height: '100%',
+                minHeight: { xs: 300, md: 500 },
                 objectFit: 'cover',
               }}
-              src={product.product_image_url || 'https://via.placeholder.com/300'}
+              src={product.product_image_url || 'https://via.placeholder.com/600'}
               alt={product.product_name}
             />
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Stack spacing={2}>
-              <Box>
-                <Typography variant="overline" color="text.secondary">
-                  Category
-                </Typography>
-                <Typography variant="h6" fontWeight={600}>
+          <Grid item xs={12} md={6}>
+            <Box sx={{ p: { xs: 4, md: 6 }, height: '100%', display: 'flex', flexDirection: 'column' }}>
+              <Box sx={{ mb: 4 }}>
+                <Typography variant="overline" sx={{ color: 'primary.main', fontWeight: 600, letterSpacing: '0.1em' }}>
                   {product.product_category_name}
                 </Typography>
-              </Box>
-
-              <Box>
-                <Typography variant="overline" color="text.secondary">
-                  Name
+                <Typography variant="h2" sx={{ my: 1 }}>
+                  {product.product_name || 'Masterpiece No. ' + product.product_id.slice(-4)}
                 </Typography>
-                <Typography variant="body1">
-                  {product.product_name || 'No name available'}
+                <Typography variant="h3" sx={{ color: 'text.primary', mt: 2 }}>
+                  ₹{Number(product.price).toLocaleString()}
                 </Typography>
               </Box>
 
-              <Box>
-                <Typography variant="overline" color="text.secondary">
-                  Price
-                </Typography>
-                <Typography variant="h5" color="primary" fontWeight={700}>
-                  ₹{product.price}
-                </Typography>
-              </Box>
+              <Divider sx={{ my: 4, opacity: 0.5 }} />
 
-              <Box>
-                <Typography variant="overline" color="text.secondary">
-                  Availability
-                </Typography>
-                <Typography
-                  variant="body2"
-                  color={product.product_qty > 0 ? 'success.main' : 'error.main'}
+              <Stack spacing={4}>
+                <Box>
+                  <Typography variant="overline" color="text.secondary" sx={{ display: 'block', mb: 2 }}>
+                    Specifications
+                  </Typography>
+                  <Grid container spacing={3}>
+                    {[
+                      { label: 'Weight', value: `${product.product_weight_g}g` },
+                      { label: 'Height', value: `${product.product_height_cm}cm` },
+                      { label: 'Width', value: `${product.product_width_cm}cm` },
+                    ].map((spec) => (
+                      <Grid item xs={4} key={spec.label}>
+                        <Typography variant="caption" color="text.secondary" display="block">{spec.label}</Typography>
+                        <Typography variant="body1" fontWeight={600}>{spec.value}</Typography>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+
+                <Box>
+                  <Typography variant="overline" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                    Availability
+                  </Typography>
+                  <Typography
+                    variant="body1"
+                    sx={{ 
+                      color: product.product_qty > 0 ? 'success.main' : 'error.main',
+                      fontWeight: 600
+                    }}
+                  >
+                    {product.product_qty > 0 ? `Ready for Acquisition (${product.product_qty})` : 'Curated / Out of Stock'}
+                  </Typography>
+                </Box>
+              </Stack>
+
+              <Box sx={{ mt: 'auto', pt: 6 }}>
+                <Stack direction="row" spacing={2}>
+                  <Button
+                    fullWidth
+                    variant="outlined"
+                    startIcon={<ShoppingCart />}
+                    onClick={() => {
+                      onAddToCart(product.product_id);
+                      onClose();
+                    }}
+                    sx={{ py: 2, borderRadius: '12px' }}
+                  >
+                    Add to Cart
+                  </Button>
+                  <AuthButton
+                    fullWidth
+                    startIcon={<ShoppingBag />}
+                    onClick={() => {
+                      onBuy(product);
+                      onClose();
+                    }}
+                    sx={{ py: 2 }}
+                  >
+                    Acquire Now
+                  </AuthButton>
+                </Stack>
+                <Button 
+                  fullWidth 
+                  onClick={onClose} 
+                  sx={{ mt: 2, color: 'text.disabled' }}
                 >
-                  {product.product_qty > 0 ? `In Stock: ${product.product_qty}` : 'Out of Stock'}
-                </Typography>
+                  Dismiss
+                </Button>
               </Box>
-            </Stack>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Divider sx={{ my: 1 }} />
-            <Typography variant="subtitle2" gutterBottom sx={{ mt: 1, fontWeight: 700 }}>
-              Physical Specifications
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={4}>
-                <Typography variant="caption" color="text.secondary">
-                  Weight
-                </Typography>
-                <Typography variant="body2">{product.product_weight_g}g</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography variant="caption" color="text.secondary">
-                  Height
-                </Typography>
-                <Typography variant="body2">{product.product_height_cm}cm</Typography>
-              </Grid>
-              <Grid item xs={4}>
-                <Typography variant="caption" color="text.secondary">
-                  Width
-                </Typography>
-                <Typography variant="body2">{product.product_width_cm}cm</Typography>
-              </Grid>
-            </Grid>
+            </Box>
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions sx={{ p: 2, justifyContent: 'space-between' }}>
-        <Button onClick={onClose} variant="contained" color="error">
-          Close
-        </Button>
-        <Stack direction="row" spacing={2}>
-          <Button
-            variant="contained"
-            startIcon={<ShoppingCart />}
-            onClick={() => {
-              onAddToCart(product.product_id);
-              onClose();
-            }}
-          >
-            Add to Cart
-          </Button>
-          <Button
-            variant="contained"
-            startIcon={<ShoppingBag />}
-            onClick={() => {
-              onBuy(product);
-              onClose();
-            }}
-          >
-            Buy Now
-          </Button>
-        </Stack>
-      </DialogActions>
     </Dialog>
   );
 };

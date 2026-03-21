@@ -1,3 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap');
+
+:root {
+  /* Liquid Luxury Tokens - Light Mode */
+  --liquid-bg-light: #F0F4F8;
+  --liquid-accent-light: #4F7C82;
+  --liquid-surface-light: rgba(255, 255, 255, 0.7);
+  
+  /* Liquid Luxury Tokens - Dark Mode */
+  --liquid-bg-dark: #050B14;
+  --liquid-accent-dark: #B8E3E9;
+  --liquid-surface-dark: rgba(25, 34, 48, 0.7);
+
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Montserrat', sans-serif;
+  
+  --glass-blur: blur(12px);
+  --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -5,11 +25,39 @@
 }
 
 body {
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-body);
   margin: 0;
   padding: 0;
-  background-color: #f9f9f9;
+  background-color: var(--liquid-bg-light);
+  color: #1A1A1A;
   min-height: 100vh;
+  transition: background-color 0.4s ease, color 0.4s ease;
+  overflow-x: hidden;
+}
+
+/* Glassmorphism Utility */
+.glass {
+  background: var(--liquid-surface-light);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+}
+
+.dark-mode .glass {
+  background: var(--liquid-surface-dark);
+}
+
+/* Liquid Animation */
+@keyframes fluid-drift {
+  0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+  50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+  100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+}
+
+.liquid-shape {
+  animation: fluid-drift 8s ease-in-out infinite;
+  background: linear-gradient(45deg, var(--liquid-accent-light), #8DCCD4);
 }
 
 input:-webkit-autofill,

@@ -66,46 +66,90 @@ export const LoginForm = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <StyledCard sx={{ width: '100%', maxWidth: 400 }}>
-        <Typography variant="h3" align="center" color="#161C24" fontWeight={800} gutterBottom>
-          Login
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        minHeight: '70vh',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Background Decoration */}
+      <Box
+        className="liquid-shape"
+        sx={{
+          position: 'absolute',
+          top: '-10%',
+          right: '-5%',
+          width: '300px',
+          height: '300px',
+          opacity: 0.1,
+          zIndex: 0,
+        }}
+      />
+      
+      <StyledCard 
+        sx={{ 
+          width: '100%', 
+          maxWidth: 420, 
+          zIndex: 1,
+          p: { xs: 4, md: 6 },
+        }}
+      >
+        <Typography 
+          variant="h2" 
+          align="center" 
+          gutterBottom
+          sx={{ mb: 1 }}
+        >
+          Welcome Back
         </Typography>
 
-        <Typography variant="body2" align="center" color="#637381" sx={{ mb: 4 }}>
-          Enter your details below to continue.
+        <Typography 
+          variant="body1" 
+          align="center" 
+          color="text.secondary" 
+          sx={{ mb: 5, letterSpacing: '0.02em' }}
+        >
+          Enter your credentials to access your luxury experience.
         </Typography>
 
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={3}>
+          <Stack spacing={4}>
             <StyledTextField
-              label="Email address"
-              variant="outlined"
+              label="Email Address"
               fullWidth
               {...register('email', { required: 'Email is required' })}
               error={!!errors.email}
               helperText={errors.email?.message}
             />
 
-            <StyledTextField
-              label="Password"
-              type="password"
-              variant="outlined"
-              fullWidth
-              {...register('password', { required: 'Password is required' })}
-              error={!!errors.password}
-              helperText={errors.password?.message}
-            />
-
-            <Box sx={{ textAlign: 'right' }}>
-              <MuiLink 
-                component={Link} 
-                to="/forgot-password" 
-                variant="body2" 
-                sx={{ color: 'primary.main', fontWeight: 600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
-              >
-                Forgot password?
-              </MuiLink>
+            <Box>
+              <StyledTextField
+                label="Password"
+                type="password"
+                fullWidth
+                {...register('password', { required: 'Password is required' })}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+              />
+              <Box sx={{ textAlign: 'right', mt: 1.5 }}>
+                <MuiLink 
+                  component={Link} 
+                  to="/forgot-password" 
+                  variant="overline" 
+                  sx={{ 
+                    color: 'text.secondary',
+                    textDecoration: 'none', 
+                    '&:hover': { color: 'primary.main' },
+                    transition: 'color 0.2s'
+                  }}
+                >
+                  Forgot password?
+                </MuiLink>
+              </Box>
             </Box>
 
             <AuthButton
@@ -113,23 +157,30 @@ export const LoginForm = () => {
               type="submit"
               size="large"
               fullWidth
+              sx={{ mt: 2 }}
             >
-              Login
+              Sign In
             </AuthButton>
 
-            <Typography variant="body2" align="center" color="#637381">
-              Don't have an account?{' '}
+            <Typography variant="body2" align="center" color="text.secondary" sx={{ mt: 2 }}>
+              New to our collection?{' '}
               <MuiLink 
                 component={Link} 
                 to="/signup" 
-                sx={{ color: 'primary.main', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                sx={{ 
+                  color: 'primary.main', 
+                  fontWeight: 600, 
+                  textDecoration: 'none', 
+                  '&:hover': { textDecoration: 'underline' } 
+                }}
               >
-                Get started
+                Create Account
               </MuiLink>
             </Typography>
           </Stack>
         </form>
       </StyledCard>
+      
       <SnackBar
         open={snackOpen}
         message={snackMessage}

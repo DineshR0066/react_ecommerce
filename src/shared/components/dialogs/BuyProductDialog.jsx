@@ -10,16 +10,24 @@ import {
   Stack,
   Alert,
   CircularProgress,
+  Box,
+  Typography,
+  alpha
 } from '@mui/material';
 import { useBuyProductMutation } from '../../utils';
 
+import { 
+  StyledTextField, 
+  AuthButton 
+} from '../../styled-components/StyledComponents';
+
 export const BuyProductDialog = ({ open, onClose, product, onSuccess }) => {
-  const [buyProduct, { isLoading, isSuccess, isError, error, reset }] = useBuyProductMutation();
+  const [buyProduct, { isLoading, isSuccess, reset }] = useBuyProductMutation();
 
   const [formData, setFormData] = useState({
-    // quantity: product.quantity || 1,
     payment_type: 'credit_card',
     payment_installments: 1,
+    quantity: 1,
   });
 
   const [message, setMessage] = useState('');
@@ -49,9 +57,8 @@ export const BuyProductDialog = ({ open, onClose, product, onSuccess }) => {
 
   const handleSubmit = async () => {
     const customerId = localStorage.getItem('user_id');
-
     if (!product || !customerId) {
-      setMessage('Missing product or customer details. Please log in again.');
+      setMessage('Session expired. Please sign in again.');
       return;
     }
 
@@ -65,82 +72,95 @@ export const BuyProductDialog = ({ open, onClose, product, onSuccess }) => {
 
     try {
       await buyProduct(payload).unwrap();
-      setMessage('Product purchased successfully!');
-      if (onSuccess) {
-        onSuccess();
-      }
-
-      // Auto close after success message
-      setTimeout(() => {
-        handleClose();
-      }, 2000);
+      setMessage('Acquisition successful');
+      if (onSuccess) onSuccess();
+      setTimeout(handleClose, 2000);
     } catch (err) {
-      console.error('Purchase failed:', err);
-      setMessage(err?.data?.message || 'Purchase failed. Please try again.');
+      setMessage(err?.data?.message || 'Transaction failed');
     }
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
-      <DialogTitle>Buy Product</DialogTitle>
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      fullWidth 
+      maxWidth="xs"
+      PaperProps={{
+        sx: { 
+          borderRadius: '24px', 
+          p: 2,
+          background: 'rgba(255, 255, 255, 0.9)',
+          backdropFilter: 'blur(20px)'
+        }
+      }}
+    >
+      <DialogTitle sx={{ variant: 'h3', textAlign: 'center', pb: 0 }}>Acquire Piece</DialogTitle>
       <DialogContent>
-        <Stack spacing={2} sx={{ mt: 1 }}>
+        <Stack spacing={4} sx={{ mt: 3 }}>
           {product && (
-            <Alert severity="info">
-              Buying: <strong>{product.product_category_name || 'Product'}</strong>
+            <Box sx={{ p: 2, borderRadius: '16px', bgcolor: alpha('#4F7C82', 0.05), border: '1px solid', borderColor: alpha('#4F7C82', 0.1) }}>
+              <Typography variant="overline" color="primary.main" display="block">Selected Work</Typography>
+              <Typography variant="h5">{product.product_name || product.product_category_name}</Typography>
+            </Box>
+          )}
+
+          {message && (
+            <Alert 
+              severity={isSuccess ? 'success' : 'error'} 
+              sx={{ borderRadius: '12px' }}
+            >
+              {message}
             </Alert>
           )}
 
-          {message && <Alert severity={isSuccess ? 'success' : 'error'}>{message}</Alert>}
-
-          <TextField
+          <StyledTextField
             label="Quantity"
             name="quantity"
             type="number"
             value={formData.quantity}
             onChange={handleChange}
             fullWidth
-            inputProps={{ min: 1 }}
+            sx={{ mt: 1 }}
           />
 
-          <TextField
+          <StyledTextField
             select
-            label="Payment Type"
+            label="Method of Payment"
             name="payment_type"
             value={formData.payment_type}
             onChange={handleChange}
             fullWidth
           >
-            <MenuItem value="credit_card">Credit Card</MenuItem>
-            <MenuItem value="debit_card">Debit Card</MenuItem>
-            <MenuItem value="boleto">Boleto</MenuItem>
-            <MenuItem value="voucher">Voucher</MenuItem>
-          </TextField>
+            <MenuItem value="credit_card">Premium Card</MenuItem>
+            <MenuItem value="debit_card">Digital Core</MenuItem>
+            <MenuItem value="boleto">Direct Transfer</MenuItem>
+            <MenuItem value="voucher">Signature Credit</MenuItem>
+          </StyledTextField>
 
-          <TextField
-            label="Payment Installments"
-            name="payment_installments"
-            type="number"
-            value={formData.payment_installments}
-            onChange={handleChange}
-            fullWidth
-            inputProps={{ min: 1, max: 24 }}
-            disabled={formData.payment_type !== 'credit_card'}
-          />
+          {formData.payment_type === 'credit_card' && (
+            <StyledTextField
+              label="Installments"
+              name="payment_installments"
+              type="number"
+              value={formData.payment_installments}
+              onChange={handleChange}
+              fullWidth
+            />
+          )}
         </Stack>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose} variant="contained" color="error" disabled={isLoading}>
-          Cancel
+      <DialogActions sx={{ p: 4, pt: 2, gap: 2 }}>
+        <Button onClick={handleClose} sx={{ color: 'text.secondary', fontWeight: 600 }}>
+          Dismiss
         </Button>
-        <Button
+        <AuthButton
           onClick={handleSubmit}
-          variant="contained"
           disabled={isLoading || isSuccess}
-          startIcon={isLoading ? <CircularProgress size={20} /> : null}
+          sx={{ px: 6 }}
         >
-          {isLoading ? 'Processing...' : 'Confirm'}
-        </Button>
+          {isLoading ? 'Processing...' : 'Confirm Acquisition'}
+        </AuthButton>
       </DialogActions>
     </Dialog>
   );

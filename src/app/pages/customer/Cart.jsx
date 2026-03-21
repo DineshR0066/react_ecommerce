@@ -10,12 +10,12 @@ import {
   BuyAllDialog,
   DeleteDialog,
   SnackBar,
+  StyledCard, 
+  AuthButton
 } from '../../../shared';
-import { Add, Remove } from '@mui/icons-material';
+import { Add, Remove, DeleteOutline, ShoppingBagOutlined } from '@mui/icons-material';
 
 export const Cart = () => {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
 
@@ -32,128 +32,9 @@ export const Cart = () => {
   const [updateCart] = useUpdateCartMutation();
 
   const { data, isLoading, error } = useCartQuery({
-    page: page + 1,
-    limit: rowsPerPage,
+    page: 1,
+    limit: 100, // Show all for now for a better list experience
   });
-
-  const columns = [
-    {
-      key: 'product_category_name',
-      label: 'product category',
-    },
-    {
-      key: 'product_image_url',
-      label: 'Image',
-      render: (row) => (
-        <Box
-          component="img"
-          src={row.product_image_url}
-          alt={row.product_name}
-          sx={{
-            height: 64,
-            width: 64,
-            borderRadius: 1.5,
-            objectFit: 'cover',
-            border: (theme) => `1px solid ${theme.palette.divider}`,
-          }}
-        />
-      ),
-    },
-    {
-      key: 'price',
-      label: 'Price',
-      render: (row) => (
-        <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-          ₹{Number(row.price).toLocaleString()}
-        </Typography>
-      ),
-    },
-    {
-      key: 'product_weight_g',
-      label: 'Weight',
-    },
-    {
-      key: 'product_height_cm',
-      label: 'Height',
-    },
-    {
-      key: 'product_width_cm',
-      label: 'Width',
-    },
-    {
-      key: 'product_qty',
-      label: 'Stock',
-    },
-    {
-      key: 'quantity',
-      label: 'Quantity',
-      render: (row) => (
-        <Stack
-          direction="row"
-          alignItems="center"
-          spacing={0.5}
-          sx={{
-            border: (theme) => `1px solid ${theme.palette.divider}`,
-            borderRadius: 1,
-            p: 0.5,
-            width: 'fit-content',
-          }}
-        >
-          <IconButton
-            size="small"
-            onClick={() => handleDecrease(row)}
-            sx={{ color: 'text.secondary', p: 0.5 }}
-          >
-            <Remove fontSize="small" />
-          </IconButton>
-
-          <Typography variant="body2" sx={{ minWidth: 24, textAlign: 'center', fontWeight: 700 }}>
-            {row.quantity}
-          </Typography>
-
-          <IconButton
-            size="small"
-            onClick={() => handleIncrease(row)}
-            sx={{ color: 'primary.main', p: 0.5 }}
-          >
-            <Add fontSize="small" />
-          </IconButton>
-        </Stack>
-      ),
-    },
-    {
-      key: 'actions',
-      label: 'Actions',
-      render: (row) => (
-        <Stack direction="row" spacing={1}>
-          <Button
-            size="small"
-            variant="soft"
-            color="error"
-            onClick={() => handleRemove(row.product_id)}
-            sx={{ 
-              textTransform: 'none', 
-              fontWeight: 700,
-              bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
-              color: 'error.dark',
-              '&:hover': { bgcolor: (theme) => alpha(theme.palette.error.main, 0.16) }
-            }}
-          >
-            Remove
-          </Button>
-          <Button
-            size="small"
-            variant="contained"
-            color="primary"
-            onClick={() => handleBuy(row)}
-            sx={{ textTransform: 'none', fontWeight: 700, boxShadow: 'none' }}
-          >
-            Buy Now
-          </Button>
-        </Stack>
-      ),
-    },
-  ];
 
   const handleBuy = (product) => {
     setSelectedProduct(product);
@@ -162,7 +43,7 @@ export const Cart = () => {
 
   const handleBuyAll = () => {
     if (!data || data.length === 0) {
-      setSnackMessage('Cart is empty');
+      setSnackMessage('Your collection is empty');
       setSnackSeverity('warning');
       setSnackOpen(true);
       return;
@@ -173,17 +54,15 @@ export const Cart = () => {
   const handleBuyAllSuccess = async () => {
     try {
       const uid = localStorage.getItem('user_id');
-
       const removePromises = data.map((item) => remove({ uid, pid: item.product_id }).unwrap());
-
       await Promise.all(removePromises);
 
-      setSnackMessage('All items purchased successfully');
+      setSnackMessage('All pieces acquired successfully');
       setSnackSeverity('success');
       setSnackOpen(true);
     } catch (err) {
       console.error(err);
-      setSnackMessage('Failed to purchase all items');
+      setSnackMessage('Failed to finalize collection');
       setSnackSeverity('error');
       setSnackOpen(true);
     }
@@ -197,29 +76,15 @@ export const Cart = () => {
   const handleConfirmRemove = async () => {
     try {
       await remove({ uid: localStorage.getItem('user_id'), pid: selectedProductId }).unwrap();
-      setSnackMessage('Item removed from cart');
+      setSnackMessage('Piece removed from collection');
       setSnackSeverity('success');
       setSnackOpen(true);
       setIsDeleteDialogOpen(false);
-      setSelectedProductId(null);
     } catch (err) {
       console.error(err);
-      setSnackMessage('Failed to remove item');
+      setSnackMessage('Failed to remove piece');
       setSnackSeverity('error');
       setSnackOpen(true);
-    }
-  };
-
-  const handlePurchaseSuccess = async () => {
-    if (selectedProduct) {
-      try {
-        await remove({
-          uid: localStorage.getItem('user_id'),
-          pid: selectedProduct.product_id,
-        }).unwrap();
-      } catch (err) {
-        console.error('Failed to remove item from cart after purchase:', err);
-      }
     }
   };
 
@@ -237,18 +102,13 @@ export const Cart = () => {
 
   const handleDecrease = async (row) => {
     try {
-      const newQty = row.quantity - 1;
-
-      if (newQty <= 0) {
-        await remove({
-          uid: localStorage.getItem('user_id'),
-          pid: row.product_id,
-        }).unwrap();
+      if (row.quantity <= 1) {
+        handleRemove(row.product_id);
       } else {
         await updateCart({
           uid: localStorage.getItem('user_id'),
           pid: row.product_id,
-          qty: newQty,
+          qty: row.quantity - 1,
         }).unwrap();
       }
     } catch (err) {
@@ -256,45 +116,123 @@ export const Cart = () => {
     }
   };
 
+  const totalPrice = data?.reduce((acc, item) => acc + (item.price * item.quantity), 0) || 0;
+
+  if (isLoading) return <Box sx={{ py: 10, textAlign: 'center' }}><Typography variant="h3">Unveiling your collection...</Typography></Box>;
+
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
-      <Stack direction="row" justifyContent="flex-end" mb={3}>
-        <Button
-          variant="contained"
-          onClick={handleBuyAll}
-          sx={{
-            px: 3,
-            py: 1,
-            borderRadius: 2,
-            fontWeight: 700,
-            textTransform: 'none',
-            boxShadow: (theme) => `0 8px 16px 0 ${alpha(theme.palette.primary.main, 0.24)}`,
-          }}
-        >
-          Checkout All Items
-        </Button>
+    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
+      <Stack direction={{ xs: 'column', md: 'row' }} justifyContent="space-between" alignItems="flex-end" sx={{ mb: 6, gap: 3 }}>
+        <Box>
+          <Typography variant="h1" sx={{ mb: 1 }}>My Collection</Typography>
+          <Typography variant="body1" color="text.secondary">
+            {data?.length || 0} exquisite pieces awaiting your acquisition
+          </Typography>
+        </Box>
+        <Stack direction="row" alignItems="center" spacing={4}>
+          <Box sx={{ textAlign: 'right' }}>
+            <Typography variant="overline" color="primary.main" sx={{ display: 'block', mb: 0.5 }}>Total Investment</Typography>
+            <Typography variant="h3">₹{totalPrice.toLocaleString()}</Typography>
+          </Box>
+          <AuthButton
+            variant="contained"
+            onClick={handleBuyAll}
+            startIcon={<ShoppingBagOutlined />}
+            sx={{ px: 4, py: 2 }}
+          >
+            Acquire All
+          </AuthButton>
+        </Stack>
       </Stack>
 
-      <AdminTableLayout
-        columns={columns}
-        data={data || []}
-        page={page}
-        onPageChange={(_, newPage) => setPage(newPage)}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(e) => {
-          setRowsPerPage(parseInt(e.target.value, 10));
-          setPage(0);
-        }}
-        isLoading={isLoading}
-        isError={!!error}
-        getRowId={(row) => row.product_id}
-      />
+      {data?.length > 0 ? (
+        <Stack spacing={3}>
+          {data.map((item) => (
+            <StyledCard key={item.product_id} sx={{ p: 0, overflow: 'hidden' }}>
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' } }}>
+                <Box
+                  component="img"
+                  src={item.product_image_url}
+                  sx={{
+                    width: { xs: '100%', sm: 200 },
+                    height: 200,
+                    objectFit: 'cover',
+                  }}
+                />
+                <Box sx={{ p: 4, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                    <Box>
+                      <Typography variant="overline" color="primary.main" sx={{ display: 'block' }}>
+                        {item.product_category_name}
+                      </Typography>
+                      <Typography variant="h4" sx={{ mb: 1 }}>{item.product_name}</Typography>
+                    </Box>
+                    <IconButton 
+                      onClick={() => handleRemove(item.product_id)}
+                      sx={{ color: 'text.disabled', '&:hover': { color: 'error.main' } }}
+                    >
+                      <DeleteOutline />
+                    </IconButton>
+                  </Stack>
+
+                  <Box sx={{ mt: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Stack direction="row" alignItems="center" spacing={2}>
+                      <Typography variant="h5">₹{item.price.toLocaleString()}</Typography>
+                      <Typography variant="body2" color="text.secondary">per piece</Typography>
+                    </Stack>
+                    
+                    <Stack direction="row" alignItems="center" spacing={3}>
+                      <Stack 
+                        direction="row" 
+                        alignItems="center" 
+                        sx={{ 
+                          bgcolor: alpha('#000', 0.03), 
+                          borderRadius: '12px',
+                          p: 0.5
+                        }}
+                      >
+                        <IconButton size="small" onClick={() => handleDecrease(item)}>
+                          <Remove fontSize="small" />
+                        </IconButton>
+                        <Typography sx={{ mx: 2, fontWeight: 600, minWidth: 20, textAlign: 'center' }}>
+                          {item.quantity}
+                        </Typography>
+                        <IconButton size="small" onClick={() => handleIncrease(item)} sx={{ color: 'primary.main' }}>
+                          <Add fontSize="small" />
+                        </IconButton>
+                      </Stack>
+                      <Button 
+                        variant="text" 
+                        onClick={() => handleBuy(item)}
+                        sx={{ fontWeight: 600, textTransform: 'none' }}
+                      >
+                        Acquire Piece
+                      </Button>
+                    </Stack>
+                  </Box>
+                </Box>
+              </Box>
+            </StyledCard>
+          ))}
+        </Stack>
+      ) : (
+        <Box sx={{ py: 15, textAlign: 'center' }}>
+          <ShoppingBagOutlined sx={{ fontSize: 80, color: 'text.disabled', mb: 3, opacity: 0.2 }} />
+          <Typography variant="h3" gutterBottom>Your collection is empty</Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
+            Explore our curated catalog to find your next signature piece.
+          </Typography>
+          <Button variant="outlined" onClick={() => window.history.back()} sx={{ borderRadius: '12px', px: 4 }}>
+            Continue Exploring
+          </Button>
+        </Box>
+      )}
+
       <BuyProductDialog
         open={isBuyDialogOpen}
         onClose={() => setIsBuyDialogOpen(false)}
         product={selectedProduct}
         isBulk={false}
-        onSuccess={handlePurchaseSuccess}
       />
       <BuyAllDialog
         open={isBuyAllDialogOpen}
@@ -306,10 +244,9 @@ export const Cart = () => {
         open={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleConfirmRemove}
-        title="Remove Item"
-        description="Are you sure you want to remove this item from your cart?"
-        confirmText="Remove"
-        cancelText="Cancel"
+        title="Remove from Collection"
+        description="Are you sure you want to remove this exquisite piece from your selection?"
+        confirmText="Remove Piece"
       />
       <SnackBar
         open={snackOpen}

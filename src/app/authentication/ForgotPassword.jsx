@@ -38,28 +38,73 @@ export const ForgotPassword = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-      <StyledCard sx={{ width: '100%', maxWidth: 480 }}>
-        <Typography variant="h3" align="center" color="#161C24" fontWeight={800} gutterBottom>
-          Forgot Password
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        minHeight: '70vh',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+    >
+      {/* Background Decoration */}
+      <Box
+        className="liquid-shape"
+        sx={{
+          position: 'absolute',
+          top: '20%',
+          left: '-10%',
+          width: '350px',
+          height: '350px',
+          opacity: 0.1,
+          zIndex: 0,
+        }}
+      />
+
+      <StyledCard 
+        sx={{ 
+          width: '100%', 
+          maxWidth: 480, 
+          zIndex: 1,
+          p: { xs: 4, md: 6 },
+        }}
+      >
+        <Typography 
+          variant="h2" 
+          align="center" 
+          gutterBottom
+          sx={{ mb: 1 }}
+        >
+          Restore Access
         </Typography>
 
-        <Typography variant="body2" align="center" color="#637381" sx={{ mb: 4 }}>
-          Please enter the email address associated with your account and we will email you a password reset link.
+        <Typography 
+          variant="body1" 
+          align="center" 
+          color="text.secondary" 
+          sx={{ mb: 5, letterSpacing: '0.02em' }}
+        >
+          Enter your email to receive a secure password reset link.
         </Typography>
 
         <form onSubmit={handleSubmit(handlePassword)}>
-          <Stack spacing={3}>
+          <Stack spacing={4}>
             <StyledTextField
-              label="Email address"
-              variant="outlined"
+              label="Email Address"
               fullWidth
               {...register('email', { required: 'Email is required' })}
               error={!!errors.email}
               helperText={errors.email?.message}
             />
 
-            <AuthButton variant="contained" type="submit" fullWidth size="large">
+            <AuthButton 
+              variant="contained" 
+              type="submit" 
+              fullWidth 
+              size="large"
+              sx={{ mt: 2 }}
+            >
               Send Reset Link
             </AuthButton>
 
@@ -67,14 +112,21 @@ export const ForgotPassword = () => {
               <MuiLink 
                 component={Link} 
                 to="/login" 
-                sx={{ color: 'primary.main', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                variant="overline"
+                sx={{ 
+                  color: 'text.secondary', 
+                  textDecoration: 'none', 
+                  '&:hover': { color: 'primary.main' },
+                  transition: 'color 0.2s'
+                }}
               >
-                Return to login
+                Return to Login
               </MuiLink>
             </Box>
           </Stack>
         </form>
       </StyledCard>
+      
       <SnackBar
         open={snackOpen}
         message={snackMessage}

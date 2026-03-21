@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import {
+import { useState } from 'react';
+// import { useAddAddressMutation, useCustomerDetailsQuery, useEditProfileMutation, useUserDashboardQuery } from '../../../shared';
+import { 
   useCustomerDetailsQuery,
   useUserDashboardQuery,
   useEditProfileMutation,
@@ -7,6 +8,9 @@ import {
   useDeleteAddressMutation,
   SnackBar,
   ProfileLayout,
+  StyledTextField,
+  AuthButton,
+  StyledCard
 } from '../../../shared';
 import { Email, LocationOn, Home, Map } from '@mui/icons-material';
 import { PieChart } from '@mui/x-charts/PieChart';
@@ -22,6 +26,8 @@ import {
   DialogActions,
   Button,
   TextField,
+  Stack,
+  alpha
 } from '@mui/material';
 
 export const CustomerProfile = () => {
@@ -35,14 +41,14 @@ export const CustomerProfile = () => {
 
   const lastAddress = data?.addresses?.[data.addresses.length - 1];
   const addressDisplay = lastAddress
-    ? `${lastAddress.address_line}, ${lastAddress.city}, ${lastAddress.state} ${lastAddress.zip_code}`
-    : 'No address saved';
+    ? `${lastAddress.address_line}, ${lastAddress.city}, ${lastAddress.state}`
+    : 'No address curated';
 
   const fields = [
-    { icon: <Email color="primary" />, label: 'Email Address', value: data?.email },
+    { icon: <Email />, label: 'Digital Identity', value: data?.email },
     {
-      icon: <Home color="primary" />,
-      label: 'Address',
+      icon: <Home />,
+      label: 'Primary Residence',
       value: addressDisplay,
     },
   ];
@@ -67,7 +73,6 @@ export const CustomerProfile = () => {
     setFormData({
       email: data?.email || '',
     });
-
     setOpenEdit(true);
   };
 
@@ -77,7 +82,6 @@ export const CustomerProfile = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -86,33 +90,20 @@ export const CustomerProfile = () => {
 
   const handleAddAddress = async () => {
     const uid = localStorage.getItem("user_id");
-
     try {
       if (!newAddress.address_line || !newAddress.city || !newAddress.state || !newAddress.zip_code) {
-        setSnackMessage("Please fill all fields");
+        setSnackMessage("Please refine all address fields");
         setSnackSeverity("error");
         setSnackOpen(true);
         return;
-      } else {
-        await addAddress({
-          uid,
-          data: newAddress
-        }).unwrap();
-
-        setSnackMessage("Address added");
-        setSnackSeverity("success");
-        setSnackOpen(true);
-
-        setNewAddress({
-          address_line: "",
-          city: "",
-          state: "",
-          zip_code: ""
-        });
       }
-
+      await addAddress({ uid, data: newAddress }).unwrap();
+      setSnackMessage("Address added to your collection");
+      setSnackSeverity("success");
+      setSnackOpen(true);
+      setNewAddress({ address_line: "", city: "", state: "", zip_code: "" });
     } catch (err) {
-      setSnackMessage("Failed to add address");
+      setSnackMessage("Failed to expand collection");
       setSnackSeverity("error");
       setSnackOpen(true);
     }
@@ -120,15 +111,13 @@ export const CustomerProfile = () => {
 
   const handleDeleteAddress = async (id) => {
     const uid = localStorage.getItem('user_id');
-
     try {
       await deleteAddress({ uid, data: { _id: id } }).unwrap();
-
-      setSnackMessage('Address deleted');
+      setSnackMessage('Address removed');
       setSnackSeverity('success');
       setSnackOpen(true);
     } catch (err) {
-      setSnackMessage('Delete failed');
+      setSnackMessage('Action failed');
       setSnackSeverity('error');
       setSnackOpen(true);
     }
@@ -137,267 +126,207 @@ export const CustomerProfile = () => {
   const handleSubmit = async () => {
     try {
       const uid = localStorage.getItem('user_id');
-      console.log(formData);
-      if (
-        newAddress.address_line == '' ||
-        newAddress.city == '' ||
-        newAddress.state == '' ||
-        newAddress.zip_code == ''
-      ) {
-        setSnackMessage('Fill all the feilds');
-        setSnackSeverity('error');
-        setSnackOpen(true);
-        return;
-      }
       await editProfile({
         uid: uid,
         data: {
           email: formData.email,
-          addresses: [...data.addresses, newAddress],
         },
       }).unwrap();
-      setNewAddress({
-        address_line: '',
-        city: '',
-        state: '',
-        zip_code: '',
-      });
       setOpenEdit(false);
-      setSnackMessage('edited sucessfully');
+      setSnackMessage('Profile refined');
       setSnackSeverity('success');
       setSnackOpen(true);
     } catch (err) {
-      console.error('Profile update failed:', err);
-      setSnackMessage(err.data.message);
+      console.error('Update failed:', err);
+      setSnackMessage(err.data?.message || 'Update failed');
       setSnackSeverity('error');
       setSnackOpen(true);
     }
   };
 
   return (
-    <Box sx={{ width: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Button variant="contained" color="primary" onClick={handleEditOpen}>
-          Edit Profile
+    <Box sx={{ width: '100%', py: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 4, px: 2 }}>
+        <Button 
+          variant="outlined" 
+          onClick={handleEditOpen}
+          sx={{ borderRadius: '12px', px: 4 }}
+        >
+          Refine Profile
         </Button>
       </Box>
+
       <ProfileLayout data={data} isLoading={isLoading} isError={!!error} fields={fields} />
-      <Dialog open={openEdit} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Edit Profile</DialogTitle>
 
-        <DialogContent
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 2,
-            mt: 1,
-            maxHeight: '70vh',
-            overflowY: 'auto',
-          }}
-        >
-          <TextField
-            label="Email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            fullWidth
-          />
+      <Dialog 
+        open={openEdit} 
+        onClose={handleClose} 
+        maxWidth="sm" 
+        fullWidth
+        PaperProps={{
+          sx: { 
+            borderRadius: '24px', 
+            p: 2,
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(10px)'
+          }
+        }}
+      >
+        <DialogTitle sx={{ variant: 'h3', textAlign: 'center' }}>Refine Your Identity</DialogTitle>
 
-          <Typography variant="h6" sx={{ mt: 2 }}>
-            Addresses
-          </Typography>
+        <DialogContent sx={{ mt: 2 }}>
+          <Stack spacing={4}>
+            <StyledTextField
+              label="Email Address"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              fullWidth
+            />
 
-          {data?.addresses?.map((addr) => (
-            <Box
-              key={addr._id}
-              sx={{
-                p: 1.5,
-                mt: 1,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 2,
-              }}
-            >
-              <Typography variant="body2">
-                {addr.address_line}, {addr.city}, {addr.state} - {addr.zip_code}
-              </Typography>
-
-              <Button size="small" color="error" onClick={() => handleDeleteAddress(addr._id)}>
-                Delete
-              </Button>
+            <Box>
+              <Typography variant="h4" sx={{ mb: 2 }}>Collection of Residences</Typography>
+              <Stack spacing={2}>
+                {data?.addresses?.map((addr) => (
+                  <Box
+                    key={addr._id}
+                    sx={{
+                      p: 2,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      borderRadius: '16px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}
+                  >
+                    <Typography variant="body2">
+                      {addr.address_line}, {addr.city}, {addr.state}
+                    </Typography>
+                    <Button 
+                      size="small" 
+                      color="error" 
+                      onClick={() => handleDeleteAddress(addr._id)}
+                      sx={{ minWidth: 'auto', p: 1 }}
+                    >
+                      Remove
+                    </Button>
+                  </Box>
+                ))}
+              </Stack>
             </Box>
-          ))}
 
-          <Typography variant="subtitle1" sx={{ mt: 2 }} onClick={() => handleAddAddress()}>
-            Add New Address
-          </Typography>
-
-          <TextField
-            label="Address"
-            fullWidth
-            value={newAddress.address_line}
-            onChange={(e) => setNewAddress({ ...newAddress, address_line: e.target.value })}
-          />
-
-          <TextField
-            label="City"
-            fullWidth
-            value={newAddress.city}
-            onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
-          />
-
-          <TextField
-            label="State"
-            fullWidth
-            value={newAddress.state}
-            onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
-          />
-
-          <TextField
-            label="Zip Code"
-            fullWidth
-            value={newAddress.zip_code}
-            onChange={(e) => setNewAddress({ ...newAddress, zip_code: e.target.value })}
-          />
+            <Box>
+              <Typography variant="h5" sx={{ mb: 2 }}>Curate New Residence</Typography>
+              <Stack spacing={3}>
+                <StyledTextField
+                  label="Address Line"
+                  fullWidth
+                  value={newAddress.address_line}
+                  onChange={(e) => setNewAddress({ ...newAddress, address_line: e.target.value })}
+                />
+                <Stack direction="row" spacing={3}>
+                  <StyledTextField
+                    label="City"
+                    fullWidth
+                    value={newAddress.city}
+                    onChange={(e) => setNewAddress({ ...newAddress, city: e.target.value })}
+                  />
+                  <StyledTextField
+                    label="State"
+                    fullWidth
+                    value={newAddress.state}
+                    onChange={(e) => setNewAddress({ ...newAddress, state: e.target.value })}
+                  />
+                </Stack>
+                <StyledTextField
+                  label="Zip Code"
+                  fullWidth
+                  value={newAddress.zip_code}
+                  onChange={(e) => setNewAddress({ ...newAddress, zip_code: e.target.value })}
+                />
+                <Button 
+                  variant="text" 
+                  onClick={handleAddAddress}
+                  sx={{ fontWeight: 600 }}
+                >
+                  Add to Collection
+                </Button>
+              </Stack>
+            </Box>
+          </Stack>
         </DialogContent>
 
-        <DialogActions>
-          <Button variant="contained" onClick={handleClose}>
-            Cancel
+        <DialogActions sx={{ p: 4, gap: 2 }}>
+          <Button onClick={handleClose} sx={{ color: 'text.secondary' }}>
+            Dismiss
           </Button>
-
-          <Button variant="contained" onClick={handleSubmit}>
-            Save
-          </Button>
+          <AuthButton onClick={handleSubmit} sx={{ px: 6 }}>
+            Commit Changes
+          </AuthButton>
         </DialogActions>
       </Dialog>
 
-      <Box sx={{ mt: 5, px: 2 }}>
-        <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>
-          Customer Dashboard
-        </Typography>
+      <Box sx={{ mt: 8, px: 2 }}>
+        <Typography variant="h2" sx={{ mb: 6 }}>Dashboard Overview</Typography>
 
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              md: 'repeat(3,1fr)',
-            },
-            gap: 3,
-            mb: 4,
-          }}
-        >
-          <Paper
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              border: '1px solid rgba(156,53,197,0.2)',
-              background: 'rgba(156,53,197,0.05)',
-            }}
-          >
-            <Typography variant="body2" color="text.secondary">
-              Total Spent
-            </Typography>
+        <Grid container spacing={4} sx={{ mb: 6 }}>
+          {[
+            { label: 'Total Acquisition', value: `₹${Number(dashboard?.total_spent || 0).toLocaleString()}`, color: 'primary.main' },
+            { label: 'Total Engagements', value: dashboard?.total_orders || 0, color: 'text.primary' },
+            { label: 'Finalized Journeys', value: dashboard?.delivered_orders || 0, color: 'text.primary' }
+          ].map((stat, i) => (
+            <Grid item xs={12} md={4} key={i}>
+              <StyledCard sx={{ p: 4 }}>
+                <Typography variant="overline" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
+                  {stat.label}
+                </Typography>
+                <Typography variant="h1" sx={{ color: stat.color }}>
+                  {stat.value}
+                </Typography>
+              </StyledCard>
+            </Grid>
+          ))}
+        </Grid>
 
-            <Typography variant="h4" sx={{ color: '#9c35c5', fontWeight: 700 }}>
-              ₹{dashboard?.total_spent || 0}
-            </Typography>
-          </Paper>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <StyledCard sx={{ p: 4 }}>
+              <Typography variant="h4" sx={{ mb: 4 }}>Engagement Status</Typography>
+              <PieChart
+                height={300}
+                series={[
+                  {
+                    data: [
+                      { id: 0, value: dashboard?.delivered_orders || 0, label: 'Finalized', color: '#4F7C82' },
+                      { id: 1, value: (dashboard?.total_orders || 0) - (dashboard?.delivered_orders || 0), label: 'In Progress', color: alpha('#4F7C82', 0.2) },
+                    ],
+                    innerRadius: 80,
+                    paddingAngle: 5,
+                    cornerRadius: 10,
+                  },
+                ]}
+              />
+            </StyledCard>
+          </Grid>
 
-          <Paper
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              border: '1px solid rgba(156,53,197,0.2)',
-            }}
-          >
-            <Typography variant="body2" color="text.secondary">
-              Total Orders
-            </Typography>
-
-            <Typography variant="h4" fontWeight={700}>
-              {dashboard?.total_orders || 0}
-            </Typography>
-          </Paper>
-
-          <Paper
-            sx={{
-              p: 3,
-              borderRadius: 3,
-              border: '1px solid rgba(156,53,197,0.2)',
-            }}
-          >
-            <Typography variant="body2" color="text.secondary">
-              Delivered Orders
-            </Typography>
-
-            <Typography variant="h4" fontWeight={700}>
-              {dashboard?.delivered_orders || 0}
-            </Typography>
-          </Paper>
-        </Box>
-
-        <Box
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: {
-              xs: '1fr',
-              md: '1fr 1fr',
-            },
-            gap: 3,
-          }}
-        >
-          <Paper sx={{ p: 3, borderRadius: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Order Status
-            </Typography>
-
-            <PieChart
-              height={260}
-              series={[
-                {
-                  data: [
-                    {
-                      id: 0,
-                      value: dashboard?.delivered_orders || 0,
-                      label: 'Delivered',
-                      color: '#4caf50',
-                    },
-                    {
-                      id: 1,
-                      value: (dashboard?.total_orders || 0) - (dashboard?.delivered_orders || 0),
-                      label: 'Pending',
-                      color: '#9c35c5',
-                    },
-                  ],
-                },
-              ]}
-            />
-          </Paper>
-
-          <Paper sx={{ p: 3, borderRadius: 3 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              Orders Overview
-            </Typography>
-
-            <BarChart
-              height={260}
-              xAxis={[
-                {
-                  scaleType: 'band',
-                  data: ['Orders', 'Delivered'],
-                },
-              ]}
-              series={[
-                {
-                  data: [dashboard?.total_orders || 0, dashboard?.delivered_orders || 0],
-                  color: '#9c35c5',
-                },
-              ]}
-            />
-          </Paper>
-        </Box>
+          <Grid item xs={12} md={6}>
+            <StyledCard sx={{ p: 4 }}>
+              <Typography variant="h4" sx={{ mb: 4 }}>Acquisition Growth</Typography>
+              <BarChart
+                height={300}
+                xAxis={[{ scaleType: 'band', data: ['Journeys', 'Finalizations'] }]}
+                series={[
+                  {
+                    data: [dashboard?.total_orders || 0, dashboard?.delivered_orders || 0],
+                    color: '#4F7C82',
+                  },
+                ]}
+                borderRadius={12}
+              />
+            </StyledCard>
+          </Grid>
+        </Grid>
       </Box>
 
       <SnackBar

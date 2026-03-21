@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { Button } from '@mui/material';
+import { 
+  Button, 
+  Box, 
+  Typography, 
+  alpha, 
+  Container, 
+  Stack 
+} from '@mui/material';
 
 import {
   AdminTableLayout,
@@ -7,13 +14,18 @@ import {
   useCancelOrderMutation,
   DeleteDialog,
   SnackBar,
+  StyledCard, 
+  StatusLabel,
+  AuthButton 
 } from '../../../shared';
-import { Box, Typography, alpha } from '@mui/material';
-import { StatusLabel } from '../../../shared/styled-components/StyledComponents';
+import { 
+  ShoppingBagOutlined, 
+  AccessTime, 
+  LocationOnOutlined, 
+  CancelOutlined 
+} from '@mui/icons-material';
 
 export const Order = () => {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -24,8 +36,8 @@ export const Order = () => {
   const uid = localStorage.getItem('user_id');
 
   const { data, isLoading, error } = useGetAllProductsQuery({
-    page: page + 1,
-    limit: rowsPerPage,
+    page: 1,
+    limit: 50, // Show recent orders for a better experience
     uid: uid,
   });
 
@@ -40,151 +52,125 @@ export const Order = () => {
     if (selectedOrder) {
       try {
         await cancelOrder(selectedOrder.order_id).unwrap();
-        setSnackMessage('Order cancelled successfully');
+        setSnackMessage('Your engagement has been gracefully withdrawn');
         setSnackSeverity('success');
         setSnackOpen(true);
         setIsDeleteDialogOpen(false);
         setSelectedOrder(null);
       } catch (err) {
         console.error('Failed to cancel order:', err);
-        setSnackMessage('Failed to cancel order');
+        setSnackMessage('Failed to withdraw engagement');
         setSnackSeverity('error');
         setSnackOpen(true);
       }
     }
   };
 
-  const columns = [
-    {
-      key: 'product_name',
-      label: 'Category',
-    },
-    {
-      key: 'Product_img',
-      label: 'Image',
-      render: (row) => (
-        <Box
-          component="img"
-          src={row.product_image_url}
-          alt={row.product_name}
-          sx={{
-            height: 64,
-            width: 64,
-            borderRadius: 1.5,
-            objectFit: 'cover',
-            border: (theme) => `1px solid ${theme.palette.divider}`,
-          }}
-        />
-      ),
-    },
-    {
-      key: 'order_at',
-      label: 'Ordered At',
-    },
-    {
-      key: 'product_price',
-      label: 'Product Price',
-      render: (row) => (
-        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-          ₹{Number(row.product_price).toLocaleString()}
-        </Typography>
-      ),
-    },
-    {
-      key: 'freight_value',
-      label: 'Freight',
-      render: (row) => (
-        <Typography variant="body2" color="text.secondary">
-          ₹{Number(row.freight_value).toLocaleString()}
-        </Typography>
-      ),
-    },
-    {
-      key: 'total_price',
-      label: 'Price',
-      render: (row) => {
-        const total = (Number(row.product_price) || 0) + (Number(row.freight_value) || 0);
-        return (
-          <Typography variant="subtitle2" sx={{ fontWeight: 700, color: 'text.primary' }}>
-            ₹{total.toLocaleString()}
-          </Typography>
-        );
-      },
-    },
-    {
-      key: 'status',
-      label: 'Status',
-      render: (row) => {
-        const getStatusColor = (status) => {
-          switch (status?.toLowerCase()) {
-            case 'delivered': return 'success';
-            case 'shipped': return 'info';
-            case 'processing': return 'warning';
-            case 'cancelled': return 'error';
-            default: return 'default';
-          }
-        };
-        return (
-          <StatusLabel color={getStatusColor(row.status)}>
-            {row.status}
-          </StatusLabel>
-        );
-      },
-    },
-    {
-      key: 'payment_type',
-      label: 'Payment',
-    },
-    {
-      key: 'action',
-      label: 'Action',
-      render: (row) => {
-        return (
-          <Button
-            variant="soft"
-            size="small"
-            color="error"
-            onClick={() => handleCancel(row)}
-            disabled={row.status === 'cancelled' || row.status === 'delivered'}
-            sx={{ 
-              textTransform: 'none', 
-              fontWeight: 700,
-              bgcolor: (theme) => alpha(theme.palette.error.main, 0.08),
-              '&:hover': { bgcolor: (theme) => alpha(theme.palette.error.main, 0.16) },
-              '&.Mui-disabled': { bgcolor: 'action.disabledBackground' }
-            }}
-          >
-            Cancel Order
-          </Button>
-        );
-      },
-    },
-  ];
+  const getStatusColor = (status) => {
+    switch (status?.toLowerCase()) {
+      case 'delivered': return 'success';
+      case 'shipped': return 'info';
+      case 'processing': return 'warning';
+      case 'cancelled': return 'error';
+      default: return 'default';
+    }
+  };
+
+  if (isLoading) return <Box sx={{ py: 10, textAlign: 'center' }}><Typography variant="h3">Recalling your history...</Typography></Box>;
 
   return (
-    <>
-      <AdminTableLayout
-        columns={columns}
-        data={data || []}
-        page={page}
-        onPageChange={(_, newPage) => setPage(newPage)}
-        rowsPerPage={rowsPerPage}
-        onRowsPerPageChange={(e) => {
-          setRowsPerPage(parseInt(e.target.value, 10));
-          setPage(0);
-        }}
-        isLoading={isLoading}
-        isError={!!error}
-        getRowId={(row) => row.product_id}
-      />
+    <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 } }}>
+      <Box sx={{ mb: 6 }}>
+        <Typography variant="h1" sx={{ mb: 1 }}>Purchase History</Typography>
+        <Typography variant="body1" color="text.secondary">
+          Refinement across {data?.length || 0} unique acquisitions
+        </Typography>
+      </Box>
+
+      {data?.length > 0 ? (
+        <Stack spacing={4}>
+          {data.map((order) => (
+            <StyledCard key={order.order_id} sx={{ p: 0, overflow: 'hidden' }}>
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' } }}>
+                <Box
+                  component="img"
+                  src={order.product_image_url}
+                  sx={{
+                    width: { xs: '100%', md: 240 },
+                    height: 240,
+                    objectFit: 'cover',
+                  }}
+                />
+                <Box sx={{ p: 4, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
+                    <Box>
+                      <Typography variant="overline" color="primary.main" sx={{ display: 'block' }}>
+                        Order ID: #{order.order_id.slice(-8).toUpperCase()}
+                      </Typography>
+                      <Typography variant="h3" sx={{ mb: 0.5 }}>{order.product_name}</Typography>
+                      <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+                        <StatusLabel color={getStatusColor(order.status)}>
+                          {order.status}
+                        </StatusLabel>
+                        <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                          <AccessTime sx={{ fontSize: 16 }} /> {order.order_at}
+                        </Typography>
+                      </Stack>
+                    </Box>
+                    <Box sx={{ textAlign: 'right' }}>
+                      <Typography variant="h4">₹{((Number(order.product_price) || 0) + (Number(order.freight_value) || 0)).toLocaleString()}</Typography>
+                      <Typography variant="caption" color="text.secondary" display="block">Entire Acquisition</Typography>
+                    </Box>
+                  </Box>
+
+                  <Box sx={{ mt: 'auto', pt: 3, borderTop: '1px solid', borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Stack direction="row" spacing={4}>
+                      <Box>
+                        <Typography variant="caption" color="text.secondary" display="block">Payment</Typography>
+                        <Typography variant="body2" fontWeight={600}>{order.payment_type}</Typography>
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" color="text.secondary" display="block">Value</Typography>
+                        <Typography variant="body2" fontWeight={600}>₹{Number(order.product_price).toLocaleString()}</Typography>
+                      </Box>
+                    </Stack>
+                    <Button
+                      variant="text"
+                      color="error"
+                      onClick={() => handleCancel(order)}
+                      disabled={order.status === 'cancelled' || order.status === 'delivered'}
+                      startIcon={<CancelOutlined />}
+                      sx={{ 
+                        textTransform: 'none', 
+                        fontWeight: 600,
+                        '&.Mui-disabled': { opacity: 0 } 
+                      }}
+                    >
+                      Withdraw Order
+                    </Button>
+                  </Box>
+                </Box>
+              </Box>
+            </StyledCard>
+          ))}
+        </Stack>
+      ) : (
+        <Box sx={{ py: 15, textAlign: 'center' }}>
+          <ShoppingBagOutlined sx={{ fontSize: 80, color: 'text.disabled', mb: 3, opacity: 0.2 }} />
+          <Typography variant="h3" gutterBottom>No history found</Typography>
+          <Typography variant="body1" color="text.secondary">
+            Your journey with us is just beginning.
+          </Typography>
+        </Box>
+      )}
+
       <DeleteDialog
         open={isDeleteDialogOpen}
         onClose={() => setIsDeleteDialogOpen(false)}
         onConfirm={handleConfirmCancel}
-        title="Cancel Order"
-        description="Are you sure you want to cancel this order?"
-        confirmText="Yes, Cancel"
-        cancelText="No, Keep"
+        title="Withdraw Order"
+        description="Are you sure you want to gracefully withdraw this engagement? This action is finalized."
+        confirmText="Withdraw Acquisition"
       />
       <SnackBar
         open={snackOpen}
@@ -192,6 +178,6 @@ export const Order = () => {
         severity={snackSeverity}
         handleClose={() => setSnackOpen(false)}
       />
-    </>
+    </Container>
   );
 };

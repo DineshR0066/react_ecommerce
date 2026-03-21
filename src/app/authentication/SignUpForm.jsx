@@ -51,31 +51,66 @@ export const SignUpForm = () => {
   };
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center',
+        minHeight: '85vh',
+        position: 'relative',
+        overflow: 'hidden',
+        py: 4
+      }}
+    >
+      {/* Background Decoration */}
+      <Box
+        className="liquid-shape"
+        sx={{
+          position: 'absolute',
+          bottom: '-10%',
+          left: '-5%',
+          width: '400px',
+          height: '400px',
+          opacity: 0.1,
+          zIndex: 0,
+        }}
+      />
+
       <StyledCard
         sx={{
           width: '100%',
-          maxWidth: 480,
-          maxHeight: '85vh',
+          maxWidth: 520,
+          maxHeight: '90vh',
+          zIndex: 1,
+          p: { xs: 4, md: 6 },
           overflowY: 'auto',
           '&::-webkit-scrollbar': { display: 'none' },
           msOverflowStyle: 'none',
           scrollbarWidth: 'none',
         }}
       >
-        <Typography variant="h3" align="center" color="#161C24" fontWeight={800} gutterBottom>
-          Sign Up
+        <Typography 
+          variant="h2" 
+          align="center" 
+          gutterBottom
+          sx={{ mb: 1 }}
+        >
+          Join Our Collection
         </Typography>
 
-        <Typography variant="body2" align="center" color="#637381" sx={{ mb: 4 }}>
-          Create your account to start shopping.
+        <Typography 
+          variant="body1" 
+          align="center" 
+          color="text.secondary" 
+          sx={{ mb: 5, letterSpacing: '0.02em' }}
+        >
+          Begin your journey into a world of refined commerce.
         </Typography>
 
         <form onSubmit={handleSubmit(handleSignup)}>
-          <Stack spacing={2.5}>
+          <Stack spacing={3}>
             <StyledTextField
               label="Username"
-              variant="outlined"
               fullWidth
               {...register('username', { required: 'Username is required' })}
               error={!!errors.username}
@@ -83,46 +118,43 @@ export const SignUpForm = () => {
             />
 
             <StyledTextField
-              label="Email address"
+              label="Email Address"
               type="email"
-              variant="outlined"
               fullWidth
               {...register('email', { required: 'Email is required' })}
               error={!!errors.email}
               helperText={errors.email?.message}
             />
 
-            <StyledTextField
-              label="Password"
-              type="password"
-              variant="outlined"
-              fullWidth
-              {...register('password', { required: 'Password is required' })}
-              error={!!errors.password}
-              helperText={errors.password?.message}
-            />
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
+              <StyledTextField
+                label="Password"
+                type="password"
+                fullWidth
+                {...register('password', { required: 'Password is required' })}
+                error={!!errors.password}
+                helperText={errors.password?.message}
+              />
 
-            <StyledTextField
-              label="Confirm Password"
-              type="password"
-              variant="outlined"
-              fullWidth
-              {...register('confirmPassword', { required: 'Confirm Password is required' })}
-              error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword?.message}
-            />
+              <StyledTextField
+                label="Confirm Password"
+                type="password"
+                fullWidth
+                {...register('confirmPassword', { required: 'Confirm Password is required' })}
+                error={!!errors.confirmPassword}
+                helperText={errors.confirmPassword?.message}
+              />
+            </Stack>
 
-            <Stack direction="row" spacing={2}>
+            <Stack direction="row" spacing={3}>
               <StyledTextField
                 label="Zip Code"
-                variant="outlined"
                 fullWidth
                 {...register('zip_code', { required: 'Required' })}
                 error={!!errors.zip_code}
               />
               <StyledTextField
                 label="City"
-                variant="outlined"
                 fullWidth
                 {...register('city', { required: 'Required' })}
                 error={!!errors.city}
@@ -131,30 +163,41 @@ export const SignUpForm = () => {
 
             <StyledTextField
               label="State"
-              variant="outlined"
               fullWidth
               {...register('state', { required: 'State is required' })}
               error={!!errors.state}
               helperText={errors.state?.message}
             />
 
-            <AuthButton type="submit" variant="contained" fullWidth size="large">
-              Sign Up
+            <AuthButton 
+              type="submit" 
+              variant="contained" 
+              fullWidth 
+              size="large"
+              sx={{ mt: 2 }}
+            >
+              Create Account
             </AuthButton>
 
-            <Typography variant="body2" align="center" color="#637381">
-              Already have an account?{' '}
+            <Typography variant="body2" align="center" color="text.secondary" sx={{ mt: 2 }}>
+              Already a member?{' '}
               <MuiLink 
                 component={Link} 
                 to="/login" 
-                sx={{ color: 'primary.main', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                sx={{ 
+                  color: 'primary.main', 
+                  fontWeight: 600, 
+                  textDecoration: 'none', 
+                  '&:hover': { textDecoration: 'underline' } 
+                }}
               >
-                Login
+                Sign In
               </MuiLink>
             </Typography>
           </Stack>
         </form>
       </StyledCard>
+      
       <SnackBar
         open={snackOpen}
         message={snackMessage}
