@@ -146,7 +146,7 @@ export const SignUpForm = () => {
               Already have an account?{' '}
               <MuiLink 
                 component={Link} 
-                to="/" 
+                to="/login" 
                 sx={{ color: 'primary.main', fontWeight: 700, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
               >
                 Login

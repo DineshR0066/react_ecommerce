@@ -47,15 +47,15 @@ export const ResetPassword = () => {
     '& .MuiOutlinedInput-root': {
       '& fieldset': {
         borderColor: 'black',
-        borderWidth: '1px', // default
+        borderWidth: '1px', 
       },
       '&:hover fieldset': {
         borderColor: 'black',
-        borderWidth: '2px', // 👈 thicker on hover
+        borderWidth: '2px', 
       },
       '&.Mui-focused fieldset': {
         borderColor: 'black',
-        borderWidth: '2px', // 👈 thicker on focus
+        borderWidth: '2px', 
       },
     },
   };
@@ -71,7 +71,7 @@ export const ResetPassword = () => {
 
       console.log(res);
       setTimeout(() => {
-        navigate('/');
+        navigate('/login');
       }, 1000);
     } catch (err) {
       console.error(err);
