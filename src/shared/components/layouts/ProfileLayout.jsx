@@ -21,6 +21,7 @@ export const ProfileLayout = ({
   nameKey = 'username',
   roleKey = 'role',
   avatarKey = 'username',
+  actions,
 }) => {
   if (isLoading) {
     return (
@@ -60,36 +61,45 @@ export const ProfileLayout = ({
           display="flex"
           flexDirection={{ xs: 'column', sm: 'row' }}
           alignItems="center"
+          justifyContent="space-between"
           gap={3}
           mb={4}
         >
-          <Avatar
-            sx={{
-              width: 100,
-              height: 100,
-              bgcolor: 'primary.main',
-              color: 'primary.contrastText',
-              fontSize: '2.5rem',
-            }}
+          <Box
+            display="flex"
+            flexDirection={{ xs: 'column', sm: 'row' }}
+            alignItems="center"
+            gap={3}
           >
-            {data[avatarKey]?.charAt(0).toUpperCase()}
-          </Avatar>
-          <Box textAlign={{ xs: 'center', sm: 'left' }}>
-            <Typography
-              variant="h4"
-              fontWeight="bold"
-              gutterBottom
-              sx={{ textTransform: 'capitalize' }}
+            <Avatar
+              sx={{
+                width: 100,
+                height: 100,
+                bgcolor: 'primary.main',
+                color: 'primary.contrastText',
+                fontSize: '2.5rem',
+              }}
             >
-              {data[nameKey]}
-            </Typography>
-            <Chip
-              label={data[roleKey]?.toUpperCase()}
-              color="primary.main"
-              variant="outlined"
-              icon={<Person />}
-            />
+              {data[avatarKey]?.charAt(0).toUpperCase()}
+            </Avatar>
+            <Box textAlign={{ xs: 'center', sm: 'left' }}>
+              <Typography
+                variant="h4"
+                fontWeight="bold"
+                gutterBottom
+                sx={{ textTransform: 'capitalize' }}
+              >
+                {data[nameKey]}
+              </Typography>
+              <Chip
+                label={data[roleKey]?.toUpperCase()}
+                color="primary.main"
+                variant="outlined"
+                icon={<Person />}
+              />
+            </Box>
           </Box>
+          {actions && <Box>{actions}</Box>}
         </Box>
 
         <Divider sx={{ mb: 4 }} />
