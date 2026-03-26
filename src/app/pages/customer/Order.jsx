@@ -60,12 +60,12 @@ export const Order = () => {
       label: 'Category',
     },
     {
-      key: 'Product_img',
+      key: 'product_img',
       label: 'Image',
       render: (row) => (
         <Box
           component="img"
-          src={row.product_image_url}
+          src={row.product_img}
           alt={row.product_name}
           sx={{
             height: 64,

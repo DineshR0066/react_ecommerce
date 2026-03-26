@@ -43,10 +43,21 @@ export const ProductCardLayout = ({
 
   return (
     <Container maxWidth={false} sx={{ px: { xs: 2, sm: 3, md: 5 }, py: 0 }}>
-      <Grid container spacing={1}>
+      <Grid container spacing={4}>
         {data.length > 0 ? (
-          data.map((product) => (
-            <Grid item key={product.product_id} sx={{ display: 'flex', justifyContent: 'center' }} xs={12} sm={6} md={4} lg={3} xl={2}>
+          data.map((product, index) => (
+            <Grid 
+              item 
+              key={product.product_id} 
+              sx={{ 
+                display: 'flex', 
+                justifyContent: 'center',
+                animation: 'fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                animationDelay: `${index * 0.08}s`,
+                opacity: 0,
+              }} 
+              xs={12} sm={6} md={4} lg={3} xl={2}
+            >
               <ProductStyledCard>
                 <CardActionArea
                   onClick={() => onCardClick(product)}
@@ -149,7 +160,7 @@ export const ProductCardLayout = ({
           onPageChange={onPageChange}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={onRowsPerPageChange}
-          rowsPerPageOptions={[18, 36, 54, 72]}
+          rowsPerPageOptions={[10, 15, 20, 25]}
         />
       </Box>
     </Container>

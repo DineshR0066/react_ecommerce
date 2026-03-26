@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLogout } from '../../../app/authentication/Logout';
-import { AppBar, Toolbar, Typography, Button, Container, Box, IconButton } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Container, Box, IconButton, alpha } from '@mui/material';
 import {
   Storefront,
   ShoppingCart,
@@ -40,8 +40,16 @@ export const CustomerLayout = () => {
   const { handleLogout } = useLogout();
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static" sx={{ backgroundColor: 'primary.main' }}>
+    <Box sx={{ flexGrow: 1, minHeight: '100vh', backgroundColor: 'background.default' }}>
+      <AppBar 
+        position="sticky" 
+        sx={{ 
+          background: (theme) => alpha(theme.palette.primary.main, 0.85),
+          backdropFilter: 'blur(12px)',
+          boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        }}
+      >
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Typography variant="h4" component="div" sx={{ flexGrow: 1 }}>
             Ecommerce
@@ -52,9 +60,20 @@ export const CustomerLayout = () => {
                 color="inherit"
                 key={item.path || index}
                 onClick={() => handleNavigate(item.path)}
+                sx={{ 
+                  mx: 0.5,
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                  transition: 'all 0.3s ease',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    transform: 'translateY(-2px)',
+                  }
+                }}
               >
                 {item.icon}
-                {item.text}
+                <Typography sx={{ ml: 1, fontWeight: 'inherit', fontSize: '0.9rem' }}>{item.text}</Typography>
               </Button>
             ))}
             {/* <IconButton onClick={toggleTheme} color="inherit" sx={{ ml: 1 }}>

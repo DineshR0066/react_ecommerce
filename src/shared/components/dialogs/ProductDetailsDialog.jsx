@@ -11,13 +11,30 @@ import {
   Divider,
   Grid,
 } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import { ShoppingCart, ShoppingBag } from '@mui/icons-material';
 
 export const ProductDetailsDialog = ({ open, onClose, product, onAddToCart, onBuy }) => {
   if (!product) return null;
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <Dialog 
+      open={open} 
+      onClose={onClose} 
+      fullWidth 
+      maxWidth="sm"
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          background: (theme) => theme.palette.mode === 'light' 
+            ? 'rgba(255, 255, 255, 0.9)' 
+            : 'rgba(20, 28, 30, 0.9)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+        }
+      }}
+    >
       <DialogTitle sx={{ fontWeight: 700 }}>Product Details</DialogTitle>
       <DialogContent dividers>
         <Grid container spacing={3}>
@@ -26,12 +43,17 @@ export const ProductDetailsDialog = ({ open, onClose, product, onAddToCart, onBu
               component="img"
               sx={{
                 width: '100%',
-                height: 'auto',
+                height: 300,
                 borderRadius: 2,
-                boxShadow: 2,
                 objectFit: 'cover',
+                background: (theme) => alpha(theme.palette.primary.main, 0.05),
+                border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                  transform: 'scale(1.02)',
+                }
               }}
-              src={product.product_image_url || 'https://via.placeholder.com/300'}
+              src={product.product_image_url || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop'}
               alt={product.product_name}
             />
           </Grid>
