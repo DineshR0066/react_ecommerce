@@ -74,7 +74,7 @@ export const FilterDrawer = ({ open, onClose, onFilterChange, currentFilter }) =
           <Button
             fullWidth
             variant="outlined"
-            color="secondary"
+            color="primary"
             onClick={() => {
               onFilterChange(null);
               onClose();

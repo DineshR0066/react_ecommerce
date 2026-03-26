@@ -6,6 +6,7 @@ import {
   useAddProductMutation,
   AdminTableLayout,
   SnackBar,
+  DeleteDialog,
 } from '../../../shared';
 import { useForm } from 'react-hook-form';
 import {
@@ -38,6 +39,8 @@ export const Products = () => {
   const [open, setOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentPid, setCurrentPid] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const {
     register,
@@ -160,16 +163,29 @@ export const Products = () => {
     },
   ];
 
-  const handleDelete = async (pid) => {
+  const handleDelete = (pid) => {
+    setProductToDelete(pid);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
     const user_id = localStorage.getItem('user_id');
     try {
       await deleteProduct({
         sid: user_id,
-        pid: pid,
+        pid: productToDelete,
       }).unwrap();
-      console.log('Deleted product:', pid);
+      setSnackMessage('Product deleted successfully');
+      setSnackSeverity('success');
+      setSnackOpen(true);
     } catch (err) {
       console.error('Delete failed', err);
+      setSnackMessage('Failed to delete product');
+      setSnackSeverity('error');
+      setSnackOpen(true);
+    } finally {
+      setDeleteDialogOpen(false);
+      setProductToDelete(null);
     }
   };
 
@@ -367,11 +383,11 @@ export const Products = () => {
 
               <Box
                 sx={{
-                  border: '2px dashed #9c35c5',
+                  border: '2px dashed #4F7C82',
                   borderRadius: 2,
                   p: 2,
                   textAlign: 'center',
-                  background: 'rgba(156,53,197,0.04)',
+                  background: 'rgba(28, 49, 92, 0.04)',
                 }}
               >
                 {urlImg && (
@@ -393,11 +409,11 @@ export const Products = () => {
                   variant="outlined"
                   component="label"
                   sx={{
-                    borderColor: '#9c35c5',
-                    color: '#9c35c5',
+                    borderColor: 'primary.main',
+                    color: 'primary.main',
                     '&:hover': {
-                      borderColor: '#7b1fa2',
-                      background: 'rgba(156,53,197,0.08)',
+                      borderColor: 'primary.main',
+                      background: 'rgba(26, 57, 86, 0.08)',
                     },
                   }}
                 >
@@ -441,6 +457,14 @@ export const Products = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        onConfirm={handleConfirmDelete}
+        title="Delete Product"
+        description="Are you sure you want to delete this product? This action cannot be undone."
+      />
 
       <SnackBar
         open={snackOpen}

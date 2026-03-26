@@ -21,8 +21,9 @@ import {
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
   borderRadius: theme.spacing(2),
   boxShadow: 'none',
-  border: `1px solid ${theme.palette.divider}`,
-  backgroundColor: theme.palette.background.paper,
+  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
+  backgroundColor: alpha(theme.palette.background.paper, 0.4),
+  backdropFilter: 'blur(8px)',
 }));
 
 const StyledTableHead = styled(TableHead)(({ theme }) => ({
@@ -32,10 +33,11 @@ const StyledTableHead = styled(TableHead)(({ theme }) => ({
 const HeaderCell = styled(TableCell)(({ theme }) => ({
   color: theme.palette.text.secondary,
   fontWeight: 700,
-  fontSize: '0.75rem',
+  fontSize: '12px',
   textTransform: 'uppercase',
   padding: theme.spacing(2),
   borderBottom: `1px solid ${theme.palette.divider}`,
+  letterSpacing: '0.05em',
 }));
 
 const StyledRow = styled(TableRow)(({ theme }) => ({
@@ -48,7 +50,7 @@ const StyledRow = styled(TableRow)(({ theme }) => ({
 const DataCell = styled(TableCell)(({ theme }) => ({
   padding: theme.spacing(2),
   borderBottom: `1px solid ${theme.palette.divider}`,
-  fontSize: '0.875rem',
+  fontSize: '14px',
 }));
 
 export const AdminTableLayout = ({
@@ -107,7 +109,12 @@ export const AdminTableLayout = ({
       <Card
         sx={{
           borderRadius: 4,
-          boxShadow: '0 0 2px 0 rgba(145, 158, 171, 0.2), 0 12px 24px -4px rgba(145, 158, 171, 0.12)',
+          background: (theme) => theme.palette.mode === 'light' 
+            ? 'rgba(255, 255, 255, 0.7)' 
+            : 'rgba(20, 28, 30, 0.7)',
+          backdropFilter: 'blur(16px) saturate(180%)',
+          border: '1px solid rgba(255, 255, 255, 0.125)',
+          boxShadow: '0 8px 32px 0 rgba(79, 124, 130, 0.15)',
           overflow: 'hidden',
         }}
       >

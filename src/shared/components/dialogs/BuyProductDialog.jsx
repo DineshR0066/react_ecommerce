@@ -81,7 +81,23 @@ export const BuyProductDialog = ({ open, onClose, product, onSuccess }) => {
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="xs">
+    <Dialog 
+      open={open} 
+      onClose={handleClose} 
+      fullWidth 
+      maxWidth="xs"
+      PaperProps={{
+        sx: {
+          borderRadius: 3,
+          background: (theme) => theme.palette.mode === 'light' 
+            ? 'rgba(255, 255, 255, 0.9)' 
+            : 'rgba(20, 28, 30, 0.9)',
+          backdropFilter: 'blur(16px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.1)',
+        }
+      }}
+    >
       <DialogTitle>Buy Product</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>

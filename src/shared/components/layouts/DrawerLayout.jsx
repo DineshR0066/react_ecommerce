@@ -9,6 +9,7 @@ import {
   Divider,
   Box,
   Typography,
+  alpha,
 } from '@mui/material';
 import { Logout } from '@mui/icons-material';
 import { NavLink } from 'react-router-dom';
@@ -54,19 +55,33 @@ export const DrawerLayout = ({ title, menuItems, handleLogout, isDesktop, handle
                 end
                 className={({ isActive }) => (isActive ? 'active' : '')}
                 onClick={!isDesktop ? handleDrawerToggle : undefined}
-                sx={{
+                sx={(theme) => ({
+                  margin: '4px 12px',
+                  borderRadius: '12px',
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&.active': {
-                    backgroundColor: 'primary.main',
-                    color: 'primary.contrastText',
+                    backgroundColor: alpha(theme.palette.primary.main, 0.1),
+                    color: 'primary.main',
+                    boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.12)}`,
+                    '& .MuiListItemIcon-root': {
+                      color: 'primary.main',
+                    },
                   },
-                  '&.active .MuiListItemIcon-root': {
-                    color: 'primary.contrastText',
+                  '&:hover': {
+                    backgroundColor: alpha(theme.palette.primary.main, 0.05),
+                    transform: 'translateX(4px)',
                   },
-                }}
+                })}
               >
-                <ListItemIcon sx={{ color: 'inherit' }}>{item.icon}</ListItemIcon>
+                <ListItemIcon sx={{ color: 'inherit', minWidth: 40 }}>{item.icon}</ListItemIcon>
 
-                <ListItemText primary={item.text} />
+                <ListItemText 
+                  primary={item.text} 
+                  primaryTypographyProps={{ 
+                    fontWeight: 600,
+                    fontSize: '0.9rem'
+                  }} 
+                />
               </ListItemButton>
             </ListItem>
           ))}

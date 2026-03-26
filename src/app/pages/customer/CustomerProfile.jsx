@@ -292,15 +292,15 @@ export const CustomerProfile = () => {
             sx={{
               p: 3,
               borderRadius: 3,
-              border: '1px solid rgba(156,53,197,0.2)',
-              background: 'rgba(156,53,197,0.05)',
+              border: '1px solid rgba(53, 125, 197, 0.2)',
+              background: 'rgba(52, 71, 78, 0.05)',
             }}
           >
             <Typography variant="body2" color="text.secondary">
               Total Spent
             </Typography>
 
-            <Typography variant="h4" sx={{ color: '#9c35c5', fontWeight: 700 }}>
+            <Typography variant="h4" sx={{ color: 'primary.main', fontWeight: 700 }}>
               ₹{dashboard?.total_spent || 0}
             </Typography>
           </Paper>
@@ -309,7 +309,7 @@ export const CustomerProfile = () => {
             sx={{
               p: 3,
               borderRadius: 3,
-              border: '1px solid rgba(156,53,197,0.2)',
+              border: '1px solid rgba(53, 125, 197, 0.2)',
             }}
           >
             <Typography variant="body2" color="text.secondary">
@@ -325,7 +325,7 @@ export const CustomerProfile = () => {
             sx={{
               p: 3,
               borderRadius: 3,
-              border: '1px solid rgba(156,53,197,0.2)',
+              border: '1px solid rgba(53, 125, 197, 0.2)',
             }}
           >
             <Typography variant="body2" color="text.secondary">
