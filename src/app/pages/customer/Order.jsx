@@ -65,7 +65,7 @@ export const Order = () => {
       render: (row) => (
         <Box
           component="img"
-          src={row.product_img}
+          src={row.product_img }
           alt={row.product_name}
           sx={{
             height: 64,

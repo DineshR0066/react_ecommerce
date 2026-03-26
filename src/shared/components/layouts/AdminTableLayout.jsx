@@ -19,38 +19,45 @@ import {
 } from '@mui/material';
 
 const StyledTableContainer = styled(TableContainer)(({ theme }) => ({
-  borderRadius: theme.spacing(2),
+  borderRadius: 0,
   boxShadow: 'none',
-  border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
-  backgroundColor: alpha(theme.palette.background.paper, 0.4),
-  backdropFilter: 'blur(8px)',
+  border: 'none',
+  backgroundColor: 'transparent',
 }));
 
 const StyledTableHead = styled(TableHead)(({ theme }) => ({
-  backgroundColor: theme.palette.background.neutral || alpha(theme.palette.grey[500], 0.08),
+  backgroundColor:
+    theme.palette.mode === 'light'
+      ? alpha(theme.palette.primary.main, 0.04)
+      : alpha(theme.palette.primary.main, 0.06),
 }));
 
 const HeaderCell = styled(TableCell)(({ theme }) => ({
   color: theme.palette.text.secondary,
   fontWeight: 700,
-  fontSize: '12px',
+  fontSize: '11px',
   textTransform: 'uppercase',
-  padding: theme.spacing(2),
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  letterSpacing: '0.05em',
+  padding: theme.spacing(1.5, 2),
+  borderBottom: `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
+  letterSpacing: '0.06em',
+  whiteSpace: 'nowrap',
 }));
 
 const StyledRow = styled(TableRow)(({ theme }) => ({
   '&:hover': {
-    backgroundColor: alpha(theme.palette.primary.main, 0.04),
-    transition: theme.transitions.create('background-color'),
+    backgroundColor: alpha(theme.palette.primary.main, 0.03),
+    transition: 'background-color 0.15s ease',
+  },
+  '&:last-child td': {
+    borderBottom: 'none',
   },
 }));
 
 const DataCell = styled(TableCell)(({ theme }) => ({
-  padding: theme.spacing(2),
-  borderBottom: `1px solid ${theme.palette.divider}`,
-  fontSize: '14px',
+  padding: theme.spacing(1.5, 2),
+  borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`,
+  fontSize: '13.5px',
+  color: theme.palette.text.primary,
 }));
 
 export const AdminTableLayout = ({
@@ -71,7 +78,7 @@ export const AdminTableLayout = ({
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-        <CircularProgress color="primary" />
+        <CircularProgress color="primary" thickness={3} size={36} />
       </Box>
     );
   }
@@ -79,7 +86,7 @@ export const AdminTableLayout = ({
   if (isError) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error" sx={{ borderRadius: 2 }}>
+        <Alert severity="error" sx={{ borderRadius: '12px' }}>
           An error occurred while fetching data. Please try again.
         </Alert>
       </Container>
@@ -88,55 +95,67 @@ export const AdminTableLayout = ({
 
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
-      <Box
-        display="flex"
-        flexDirection={{ xs: 'column', sm: 'row' }}
-        justifyContent="space-between"
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
-        gap={2}
-        mb={4}
-      >
-        <Typography variant="h4" sx={{ fontWeight: 800 }}>
-          {title}
-        </Typography>
-        {headerActions && (
-          <Box display="flex" gap={1.5} width={{ xs: '100%', sm: 'auto' }}>
-            {headerActions}
-          </Box>
-        )}
-      </Box>
+      {(title || headerActions) && (
+        <Box
+          display="flex"
+          flexDirection={{ xs: 'column', sm: 'row' }}
+          justifyContent="space-between"
+          alignItems={{ xs: 'flex-start', sm: 'center' }}
+          gap={2}
+          mb={3}
+        >
+          {title && (
+            <Typography
+              variant="h4"
+              sx={{
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: 'text.primary',
+              }}
+            >
+              {title}
+            </Typography>
+          )}
+          {headerActions && (
+            <Box display="flex" gap={1.5} width={{ xs: '100%', sm: 'auto' }}>
+              {headerActions}
+            </Box>
+          )}
+        </Box>
+      )}
 
       <Card
+        elevation={0}
         sx={{
-          borderRadius: 4,
-          background: (theme) => theme.palette.mode === 'light' 
-            ? 'rgba(255, 255, 255, 0.7)' 
-            : 'rgba(20, 28, 30, 0.7)',
-          backdropFilter: 'blur(16px) saturate(180%)',
-          border: '1px solid rgba(255, 255, 255, 0.125)',
-          boxShadow: '0 8px 32px 0 rgba(79, 124, 130, 0.15)',
+          borderRadius: '16px',
+          background: (theme) =>
+            theme.palette.mode === 'light'
+              ? 'rgba(255,255,255,0.85)'
+              : 'rgba(16,23,25,0.85)',
+          backdropFilter: 'blur(16px)',
+          border: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
           overflow: 'hidden',
         }}
       >
-        {headerContent && <Box sx={{ p: 2.5 }}>{headerContent}</Box>}
-        
-        <StyledTableContainer component={Paper}>
+        {headerContent && (
+          <Box sx={{ borderBottom: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.08)}` }}>
+            {headerContent}
+          </Box>
+        )}
+
+        <StyledTableContainer component={Paper} elevation={0}>
           <Table sx={{ minWidth: 650 }}>
             <StyledTableHead>
               <TableRow>
                 {columns.map((col) => (
-                  <HeaderCell key={col.key}>
-                    {col.label}
-                  </HeaderCell>
+                  <HeaderCell key={col.key}>{col.label}</HeaderCell>
                 ))}
               </TableRow>
             </StyledTableHead>
 
             <TableBody>
               {data.map((row, index) => (
-                <StyledRow
-                  key={getRowId(row) || index}
-                >
+                <StyledRow key={getRowId(row) || index}>
                   {columns.map((col) => (
                     <DataCell key={col.key}>
                       {col.key === 'order_id' ? (
@@ -146,7 +165,7 @@ export const AdminTableLayout = ({
                             color: 'primary.main',
                             fontWeight: 700,
                             cursor: 'pointer',
-                            '&:hover': { textDecoration: 'underline' }
+                            '&:hover': { textDecoration: 'underline' },
                           }}
                         >
                           #{row[col.key]}
@@ -163,7 +182,7 @@ export const AdminTableLayout = ({
               {data.length === 0 && (
                 <TableRow>
                   <DataCell colSpan={columns.length} align="center" sx={{ py: 10 }}>
-                    <Typography variant="body1" color="text.secondary">
+                    <Typography variant="body2" color="text.secondary">
                       No data found
                     </Typography>
                   </DataCell>
@@ -182,9 +201,9 @@ export const AdminTableLayout = ({
           onRowsPerPageChange={onRowsPerPageChange}
           rowsPerPageOptions={[5, 10, 25]}
           sx={{
-            py: 1,
+            py: 0.5,
             px: 2,
-            borderTop: `1px solid ${alpha('#919EAB', 0.12)}`,
+            borderTop: (theme) => `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
             '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
               fontSize: '0.75rem',
               fontWeight: 600,

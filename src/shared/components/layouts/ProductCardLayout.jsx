@@ -7,11 +7,10 @@ import {
   Typography,
   Box,
   TablePagination,
-  Pagination,
   CircularProgress,
   Container,
   CardActionArea,
-  Divider,
+  alpha,
 } from '@mui/material';
 import { ProductStyledCard } from '../../styled-components';
 
@@ -28,7 +27,7 @@ export const ProductCardLayout = ({
   if (isLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress />
+        <CircularProgress thickness={3} size={36} />
       </Box>
     );
   }
@@ -43,19 +42,23 @@ export const ProductCardLayout = ({
 
   return (
     <Container maxWidth={false} sx={{ px: { xs: 2, sm: 3, md: 5 }, py: 0 }}>
-      <Grid container spacing={4}>
+      <Grid container spacing={3} justifyContent="flex-start">
         {data.length > 0 ? (
           data.map((product, index) => (
-            <Grid 
-              item 
-              key={product.product_id} 
-              sx={{ 
-                display: 'flex', 
+            <Grid
+              item
+              key={product.product_id}
+              sx={{
+                display: 'flex',
                 justifyContent: 'center',
-                animation: 'fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards',
-                animationDelay: `${index * 0.08}s`,
+                animation: 'fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards',
+                animationDelay: `${index * 0.06}s`,
                 opacity: 0,
-              }} 
+                '@keyframes fadeInUp': {
+                  from: { opacity: 0, transform: 'translateY(20px)' },
+                  to: { opacity: 1, transform: 'translateY(0)' },
+                },
+              }}
               xs={12} sm={6} md={4} lg={3} xl={2}
             >
               <ProductStyledCard>
@@ -71,10 +74,11 @@ export const ProductCardLayout = ({
                   <CardMedia
                     component="img"
                     sx={{
-                      height: 160,
+                      height: 155,
                       width: '100%',
                       objectFit: 'cover',
                       flexShrink: 0,
+                      transition: 'transform 0.4s ease',
                     }}
                     image={
                       product.product_image_url ||
@@ -87,18 +91,17 @@ export const ProductCardLayout = ({
                       flexGrow: 1,
                       display: 'flex',
                       flexDirection: 'column',
-                      p: 2,
-                      overflow: 'hidden',
+                      p: 1.75,
+                      '&:last-child': { pb: 1.75 },
                     }}
                   >
-                    <Box sx={{ mb: 1, flexGrow: 1, overflow: 'hidden' }}>
+                    <Box sx={{ mb: 1, flexGrow: 1 }}>
                       <Typography
                         variant="subtitle2"
                         sx={{
-                          lineHeight: 1.2,
-                          mb: 0.5,
+                          lineHeight: 1.3,
+                          mb: 0.4,
                           fontWeight: 600,
-                          // color: '#212B36',
                           display: '-webkit-box',
                           WebkitLineClamp: 2,
                           WebkitBoxOrient: 'vertical',
@@ -107,35 +110,47 @@ export const ProductCardLayout = ({
                       >
                         {product.product_name || 'No title'}
                       </Typography>
-                      <Typography variant="caption" sx={{ fontWeight: 500 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ color: 'text.secondary', fontWeight: 500 }}
+                      >
                         {product.product_category_name || 'Uncategorized'}
                       </Typography>
                     </Box>
 
-                    <Box sx={{ mt: 'auto' }}>
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        mt: 'auto',
+                      }}
+                    >
+                      <Typography
+                        variant="subtitle2"
+                        sx={{ color: 'primary.main', fontWeight: 700, fontSize: '0.9rem' }}
+                      >
+                        ₹{product.price}
+                      </Typography>
                       <Box
                         sx={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
+                          bgcolor: product.product_qty > 0
+                            ? (theme) => alpha(theme.palette.success.main, 0.1)
+                            : (theme) => alpha(theme.palette.error.main, 0.1),
+                          color: product.product_qty > 0 ? 'success.main' : 'error.main',
+                          px: 0.875,
+                          py: 0.25,
+                          borderRadius: '20px',
+                          fontSize: '0.65rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.02em',
+                          border: (theme) =>
+                            `1px solid ${product.product_qty > 0
+                              ? alpha(theme.palette.success.main, 0.2)
+                              : alpha(theme.palette.error.main, 0.2)}`,
                         }}
                       >
-                        <Typography variant="subtitle1" sx={{ color: 'primary.main', fontWeight: 700 }}>
-                          ₹{product.price}
-                        </Typography>
-                        <Box
-                          sx={{
-                            bgcolor: product.product_qty > 0 ? 'rgba(34, 197, 94, 0.16)' : 'rgba(255, 86, 48, 0.16)',
-                            color: product.product_qty > 0 ? '#118D57' : '#B71D18',
-                            px: 0.75,
-                            py: 0.25,
-                            borderRadius: 0.75,
-                            fontSize: '0.65rem',
-                            fontWeight: 700,
-                          }}
-                        >
-                          {product.product_qty > 0 ? `${product.product_qty}` : 'Out'}
-                        </Box>
+                        {product.product_qty > 0 ? `${product.product_qty}` : 'Out'}
                       </Box>
                     </Box>
                   </CardContent>
@@ -145,7 +160,7 @@ export const ProductCardLayout = ({
           ))
         ) : (
           <Grid item xs={12}>
-            <Typography variant="h6" textAlign="center">
+            <Typography variant="body2" color="text.secondary" textAlign="center" sx={{ py: 10 }}>
               No products found.
             </Typography>
           </Grid>
@@ -155,12 +170,19 @@ export const ProductCardLayout = ({
       <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
         <TablePagination
           component="div"
-          count={-1} // Since we might not have total count from some APIs, or we can pass it as a prop
+          count={-1}
           page={page}
           onPageChange={onPageChange}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={onRowsPerPageChange}
           rowsPerPageOptions={[10, 15, 20, 25]}
+          sx={{
+            '& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows': {
+              fontSize: '0.75rem',
+              fontWeight: 600,
+              color: 'text.secondary',
+            },
+          }}
         />
       </Box>
     </Container>

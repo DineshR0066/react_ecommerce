@@ -8,11 +8,13 @@ import {
   IconButton,
   useMediaQuery,
   useTheme,
+  alpha,
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import { Outlet } from 'react-router-dom';
-import { DrawerLayout } from './DrawerLayout'; // Changed from default to named import
-const drawerWidth = 260;
+import { DrawerLayout } from './DrawerLayout';
+
+const drawerWidth = 252;
 
 export const CommonLayout = ({ title, menuItems, handleLogout }) => {
   const theme = useTheme();
@@ -24,15 +26,20 @@ export const CommonLayout = ({ title, menuItems, handleLogout }) => {
   };
 
   return (
-    <Box sx={{ display: 'flex', m:0, p:0 }}>
+    <Box sx={{ display: 'flex', m: 0, p: 0 }}>
       {!isDesktop && (
         <AppBar
           position="fixed"
+          elevation={0}
           sx={{
             zIndex: (theme) => theme.zIndex.drawer + 1,
-            backgroundColor: 'background.paper',
-            color: 'text.primary',
-            boxShadow: '0px 1px 4px rgba(0,0,0,0.1)',
+            background: (theme) =>
+              theme.palette.mode === 'light'
+                ? alpha('#F0F7F8', 0.92)
+                : alpha('#0B1011', 0.92),
+            backdropFilter: 'blur(16px)',
+            borderBottom: (theme) =>
+              `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
           }}
         >
           <Toolbar>
@@ -45,7 +52,13 @@ export const CommonLayout = ({ title, menuItems, handleLogout }) => {
             >
               <MenuIcon />
             </IconButton>
-            <Typography variant="h6" color="primary" fontWeight="bold" noWrap>
+            <Typography
+              variant="h6"
+              color="primary"
+              fontWeight={800}
+              noWrap
+              sx={{ letterSpacing: '-0.02em' }}
+            >
               {title}
             </Typography>
           </Toolbar>
@@ -55,22 +68,24 @@ export const CommonLayout = ({ title, menuItems, handleLogout }) => {
       <Box
         component="nav"
         sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 } }}
-        aria-label="mailbox folders"
+        aria-label="navigation drawer"
       >
         <Drawer
           variant={isDesktop ? 'permanent' : 'temporary'}
           open={isDesktop ? true : mobileOpen}
           onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
+          ModalProps={{ keepMounted: true }}
           sx={{
             '& .MuiDrawer-paper': {
               boxSizing: 'border-box',
               width: drawerWidth,
-              borderRight: '1px solid',
-              borderColor: 'divider',
-              backgroundColor: 'background.paper',
+              borderRight: (theme) =>
+                `1px solid ${alpha(theme.palette.primary.main, 0.08)}`,
+              backgroundColor: (theme) =>
+                theme.palette.mode === 'light'
+                  ? 'rgba(255,255,255,0.85)'
+                  : 'rgba(14,20,22,0.85)',
+              backdropFilter: 'blur(16px)',
             },
           }}
         >
