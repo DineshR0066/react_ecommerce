@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { useBuyAllProductsMutation } from "../../../shared";
+import { 
+    useBuyAllProductsMutation, 
+    useCustomerDetailsQuery, 
+    useAddAddressMutation 
+} from "../../../shared";
 import {
     Dialog,
     DialogTitle,
@@ -9,15 +13,40 @@ import {
     MenuItem,
     TextField,
     Stack,
-    Alert
+    Alert,
+    CircularProgress
 } from "@mui/material";
 
 export const BuyAllDialog = ({ open, onClose, products, onSuccess }) => {
 
-    const [buyAllProducts, { isLoading }] = useBuyAllProductsMutation();
+    const [buyAllProducts, { isLoading: isBuying }] = useBuyAllProductsMutation();
+    const [addAddress, { isLoading: isAddingAddress }] = useAddAddressMutation();
+    const { data } = useCustomerDetailsQuery();
+    
+    const isLoading = isBuying || isAddingAddress;
 
     const [paymentType, setPaymentType] = useState("credit_card");
     const [installments, setInstallments] = useState(1);
+    const [selectedAddress, setSelectedAddress] = useState('');
+    const [newAddress, setNewAddress] = useState({
+        address_line: '',
+        city: '',
+        state: '',
+        zip_code: '',
+    });
+    const [message, setMessage] = useState('');
+
+    const formatAddress = (addr) => {
+        return `${addr.address_line}, ${addr.city}, ${addr.state} - ${addr.zip_code}`;
+    };
+
+    const handleNewAddressChange = (e) => {
+        const { name, value } = e.target;
+        setNewAddress((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
     const totalAmount = products?.reduce(
         (acc, item) => acc + item.price * item.quantity,
@@ -25,32 +54,70 @@ export const BuyAllDialog = ({ open, onClose, products, onSuccess }) => {
     );
 
     const handleSubmit = async () => {
-        try {
-            const uid = localStorage.getItem("user_id");
+        const uid = localStorage.getItem("user_id");
+        if (!uid) {
+            setMessage("Session expired. Please log in again.");
+            return;
+        }
 
+        let finalAddress;
+
+        if (selectedAddress === 'new') {
+            const { address_line, city, state, zip_code } = newAddress;
+
+            if (!address_line || !city || !state || !zip_code) {
+                setMessage('Please fill all address fields');
+                return;
+            }
+
+            try {
+                await addAddress({ uid: uid, data: newAddress }).unwrap();
+                finalAddress = newAddress;
+            } catch (err) {
+                console.error('Failed to add address:', err);
+                setMessage('Failed to save address. Please try again.');
+                return;
+            }
+        } else {
+            if (!selectedAddress) {
+                setMessage('Please select an address');
+                return;
+            }
+
+            try {
+                finalAddress = JSON.parse(selectedAddress);
+            } catch (e) {
+                setMessage("Invalid address selection.");
+                return;
+            }
+        }
+
+        try {
             const payload = {
                 customer_id: uid,
                 payment_type: paymentType,
                 payment_installments: Number(installments),
-
+                address: finalAddress,
                 items: products.map(item => ({
                     product_id: Array.isArray(item.product_id)
-                        ? item.product_id[0]  
+                        ? item.product_id[0]
                         : item.product_id,
                     quantity: item.quantity
                 }))
             };
-            console.log(payload)
-            console.log(typeof products[0].product_id);
             
             await buyAllProducts(payload).unwrap();
+            setMessage("Bulk purchase successful!");
 
             if (onSuccess) onSuccess();
-
-            onClose();
+            
+            setTimeout(() => {
+                onClose();
+            }, 2000);
 
         } catch (err) {
             console.error("Buy all failed", err);
+            setMessage(err?.data?.message || "Purchase failed. Please try again.");
         }
     };
 
@@ -60,6 +127,8 @@ export const BuyAllDialog = ({ open, onClose, products, onSuccess }) => {
 
             <DialogContent>
                 <Stack spacing={2} mt={1}>
+
+                    {message && <Alert severity={message.includes("successful") ? 'success' : 'error'}>{message}</Alert>}
 
                     <Alert severity="info">
                         Total Items: {products?.length}
@@ -89,17 +158,73 @@ export const BuyAllDialog = ({ open, onClose, products, onSuccess }) => {
                         disabled={paymentType !== "credit_card"}
                     />
 
+                    <TextField
+                        select
+                        label="Select Address"
+                        value={selectedAddress}
+                        onChange={(e) => setSelectedAddress(e.target.value)}
+                        fullWidth
+                    >
+                        {data?.addresses?.map((addr, index) => {
+                            const fullAddress = formatAddress(addr);
+                            return (
+                                <MenuItem key={index} value={JSON.stringify(addr)}>
+                                    {fullAddress}
+                                </MenuItem>
+                            );
+                        })}
+
+                        <MenuItem value="new">+ Add New Address</MenuItem>
+                    </TextField>
+
+                    {selectedAddress === 'new' && (
+                        <>
+                            <TextField
+                                label="Address Line"
+                                name="address_line"
+                                value={newAddress.address_line}
+                                onChange={handleNewAddressChange}
+                                fullWidth
+                            />
+
+                            <TextField
+                                label="City"
+                                name="city"
+                                value={newAddress.city}
+                                onChange={handleNewAddressChange}
+                                fullWidth
+                            />
+
+                            <TextField
+                                label="State"
+                                name="state"
+                                value={newAddress.state}
+                                onChange={handleNewAddressChange}
+                                fullWidth
+                            />
+
+                            <TextField
+                                label="Zip Code"
+                                name="zip_code"
+                                value={newAddress.zip_code}
+                                onChange={handleNewAddressChange}
+                                fullWidth
+                            />
+                        </>
+                    )}
+
                 </Stack>
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={onClose} color="error" variant="contained">
+                <Button onClick={onClose} color="error" variant="contained" disabled={isLoading}>
                     Cancel
                 </Button>
                 <Button
                     onClick={handleSubmit}
                     variant="contained"
-                    disabled={isLoading}
+                    disabled={isLoading || message.includes("successful")}
+                    startIcon={isLoading ? <CircularProgress size={20} /> : null}
                 >
                     {isLoading ? "Processing..." : "Confirm"}
                 </Button>
