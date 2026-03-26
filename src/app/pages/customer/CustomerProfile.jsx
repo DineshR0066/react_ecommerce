@@ -176,12 +176,17 @@ export const CustomerProfile = () => {
 
   return (
     <Box sx={{ width: '100%' }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-        <Button variant="contained" color="primary" onClick={handleEditOpen}>
-          Edit Profile
-        </Button>
-      </Box>
-      <ProfileLayout data={data} isLoading={isLoading} isError={!!error} fields={fields} />
+      <ProfileLayout
+        data={data}
+        isLoading={isLoading}
+        isError={!!error}
+        fields={fields}
+        actions={
+          <Button variant="contained" color="primary" onClick={handleEditOpen}>
+            Edit Profile
+          </Button>
+        }
+      />
       <Dialog open={openEdit} onClose={handleClose} maxWidth="sm" fullWidth>
         <DialogTitle>Edit Profile</DialogTitle>
 
